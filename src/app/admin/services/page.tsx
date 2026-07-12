@@ -43,13 +43,13 @@ export default function AdminServicesPage() {
     } catch {}
   };
 
-  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-cream/50">در حال بارگذاری...</p></div>;
+  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-text-muted">در حال بارگذاری...</p></div>;
   if (user?.role !== "ADMIN") return null;
 
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-cream mb-6">مدیریت خدمات و قیمت‌ها</h1>
+        <h1 className="text-2xl font-bold text-text-primary mb-6">مدیریت خدمات و قیمت‌ها</h1>
         {message && <p className="text-sm text-success mb-4 animate-fade-in">{message}</p>}
 
         <div className="space-y-4">
@@ -57,15 +57,15 @@ export default function AdminServicesPage() {
             <div key={service.id} className="glass-card p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-cream">{service.name}</h3>
-                  <p className="text-xs text-cream/50 mt-1">{service.description}</p>
+                  <h3 className="font-semibold text-text-primary">{service.name}</h3>
+                  <p className="text-xs text-text-primary/50 mt-1">{service.description}</p>
                 </div>
                 <div className="text-left">
-                  <div className="text-sm text-cream/50">قیمت فعلی</div>
-                  <div className="text-gold font-bold">{service.price.toLocaleString("fa-IR")} تومان</div>
+                  <div className="text-sm text-text-primary/50">قیمت فعلی</div>
+                  <div className="text-accent-500 font-bold">{service.price.toLocaleString("fa-IR")} تومان</div>
                 </div>
               </div>
-              <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-3">
+              <div className="mt-4 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <input
                   type="number"
                   value={editPrice[service.id] || ""}

@@ -1,10 +1,12 @@
 "use client";
 
-import { ButtonHTMLAttributes } from "react";
+import { motion } from "framer-motion";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "outline" | "danger" | "ghost";
   size?: "sm" | "md" | "lg";
+  children: ReactNode;
 }
 
 export function Button({ variant = "primary", size = "md", className = "", children, ...props }: ButtonProps) {
@@ -18,15 +20,20 @@ export function Button({ variant = "primary", size = "md", className = "", child
     primary: "btn-primary",
     outline: "btn-outline",
     danger: "btn-danger",
-    ghost: "bg-transparent text-cream/70 hover:text-cream border-none",
+    ghost: "bg-transparent text-text-muted hover:text-text-primary border-none",
   };
 
+  const MotionButton = motion.button as any;
+
   return (
-    <button
-      className={`${variantClasses[variant]} ${sizeClasses[size]} rounded-xl font-medium transition-all ${className}`}
+    <MotionButton
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      className={`${variantClasses[variant]} ${sizeClasses[size]} rounded-xl font-medium ${className}`}
       {...props}
     >
       {children}
-    </button>
+    </MotionButton>
   );
 }

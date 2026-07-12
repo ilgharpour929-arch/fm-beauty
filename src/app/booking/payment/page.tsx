@@ -23,13 +23,18 @@ function PaymentForm() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [fetchError, setFetchError] = useState("");
 
   useEffect(() => {
     if (!bookingId || !session) return;
+    setFetchError("");
     fetch(`/api/bookings/${bookingId}`)
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (!r.ok) throw new Error("خطا در دریافت اطلاعات رزرو");
+        return r.json();
+      })
       .then((data) => setBooking(data))
-      .catch(() => {});
+      .catch((e) => setFetchError(e.message));
   }, [bookingId, session]);
 
   async function handleUpload(e: React.FormEvent) {
@@ -76,43 +81,46 @@ function PaymentForm() {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
       <div className="max-w-lg w-full space-y-6">
         <div className="text-center animate-float-up">
-          <h1 className="text-2xl font-bold text-cream mb-2">پرداخت پیش‌پرداخت</h1>
-          <p className="text-cream/50">لطفاً مبلغ را واریز و فیش را آپلود کنید</p>
+          <h1 className="text-2xl font-bold text-text-primary mb-2">پرداخت پیش‌پرداخت</h1>
+          <p className="text-text-muted">لطفاً مبلغ را واریز و فیش را آپلود کنید</p>
         </div>
 
         <div className="glass-card p-6 animate-float-up" style={{ animationDelay: "0.1s" } as React.CSSProperties}>
-          <h2 className="text-lg font-semibold text-cream mb-4">اطلاعات واریز</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-4">اطلاعات واریز</h2>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-cream/50">خدمت:</span>
-              <span className="text-cream">{booking?.serviceName || "—"}</span>
+              <span className="text-text-muted">خدمت:</span>
+              <span className="text-text-primary">{booking?.serviceName || "—"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-cream/50">مبلغ پیش‌پرداخت:</span>
-              <span className="text-gold font-bold">
+              <span className="text-text-muted">مبلغ پیش‌پرداخت:</span>
+              <span className="text-accent-500 font-bold">
                 {booking?.depositAmount?.toLocaleString("fa-IR")} تومان
               </span>
             </div>
-            <hr className="border-white/5" />
+              {fetchError && (
+                <p className="text-xs text-danger text-center">{fetchError}</p>
+              )}
+              <hr className="border-accent-500/10" />
             <div className="flex justify-between">
-              <span className="text-cream/50">شماره کارت:</span>
-              <span className="text-cream font-mono" dir="ltr">{bankInfo.cardNumber}</span>
+              <span className="text-text-muted">شماره کارت:</span>
+              <span className="text-text-primary font-mono" dir="ltr">{bankInfo.cardNumber}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-cream/50">به نام:</span>
-              <span className="text-cream">{bankInfo.accountHolder}</span>
+              <span className="text-text-muted">به نام:</span>
+              <span className="text-text-primary">{bankInfo.accountHolder}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-cream/50">بانک:</span>
-              <span className="text-cream">{bankInfo.bank}</span>
+              <span className="text-text-muted">بانک:</span>
+              <span className="text-text-primary">{bankInfo.bank}</span>
             </div>
           </div>
         </div>
 
         <div className="glass-card p-6 animate-float-up" style={{ animationDelay: "0.2s" } as React.CSSProperties}>
-          <h2 className="text-lg font-semibold text-cream mb-4">آپلود فیش واریزی</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-4">آپلود فیش واریزی</h2>
           <form onSubmit={handleUpload} className="space-y-4">
-            <div className="border-2 border-dashed border-gold/20 rounded-xl p-6 text-center hover:border-gold/40 transition-colors">
+            <div className="border-2 border-dashed border-accent-500/20 rounded-xl p-6 text-center hover:border-accent-500/40 transition-colors">
               <input
                 type="file"
                 accept="image/*"
@@ -121,10 +129,10 @@ function PaymentForm() {
                 id="receipt-upload"
               />
               <label htmlFor="receipt-upload" className="cursor-pointer">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4a853" strokeWidth="1.5" className="mx-auto mb-2">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-500)" strokeWidth="1.5" className="mx-auto mb-2">
                   <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                <p className="text-sm text-cream/70">
+                <p className="text-sm text-text-secondary">
                   {file ? file.name : "برای آپلود کلیک کنید"}
                 </p>
               </label>
@@ -140,7 +148,7 @@ function PaymentForm() {
           </form>
         </div>
 
-        <p className="text-xs text-cream/30 text-center">
+        <p className="text-xs text-text-muted/50 text-center">
           پس از آپلود فیش، رزرو شما توسط مدیریت تأیید خواهد شد و از طریق پیامک به شما اطلاع داده می‌شود.
         </p>
       </div>
@@ -152,7 +160,7 @@ export default function PaymentPage() {
   return (
     <Suspense fallback={
       <div className="min-h-[80vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-accent-500 border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <PaymentForm />

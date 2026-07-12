@@ -34,8 +34,8 @@ export function Modal({ isOpen, onClose, title, children, size = "md" }: ModalPr
       <div className={`relative glass-card w-full ${sizeClasses[size]} p-6 z-10 animate-float-up max-h-[90vh] overflow-y-auto`}>
         {title && (
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-cream">{title}</h2>
-            <button onClick={onClose} className="text-cream/40 hover:text-cream transition-colors">
+            <h2 className="text-lg font-semibold text-text-primary">{title}</h2>
+            <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>

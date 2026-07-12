@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { FloatingOrbs } from "@/components/ui/FloatingOrbs";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -78,17 +79,18 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
-      <div className="glass-card max-w-md w-full p-8 animate-float-up">
+    <div className="min-h-[80vh] flex items-center justify-center px-4 py-8 relative overflow-hidden">
+      <FloatingOrbs />
+      <div className="glass-card max-w-md w-full p-8 animate-float-up relative z-10">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-cream mb-2">ثبت‌نام</h1>
-          <p className="text-sm text-cream/50">ایجاد حساب کاربری جدید</p>
+          <h1 className="text-2xl font-bold text-text-primary mb-2">ثبت‌نام</h1>
+          <p className="text-sm text-text-muted">ایجاد حساب کاربری جدید</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-cream/70 mb-1.5">نام</label>
+              <label className="block text-sm text-text-secondary mb-1.5">نام</label>
               <input
                 type="text"
                 value={formData.firstName}
@@ -98,7 +100,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-cream/70 mb-1.5">نام خانوادگی</label>
+              <label className="block text-sm text-text-secondary mb-1.5">نام خانوادگی</label>
               <input
                 type="text"
                 value={formData.lastName}
@@ -110,7 +112,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-cream/70 mb-1.5">شماره تلفن</label>
+            <label className="block text-sm text-text-secondary mb-1.5">شماره تلفن</label>
             <input
               type="tel"
               value={formData.phone}
@@ -123,7 +125,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-cream/70 mb-1.5">رمز عبور</label>
+            <label className="block text-sm text-text-secondary mb-1.5">رمز عبور</label>
             <input
               type="password"
               value={formData.password}
@@ -136,7 +138,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-cream/70 mb-1.5">تکرار رمز عبور</label>
+            <label className="block text-sm text-text-secondary mb-1.5">تکرار رمز عبور</label>
             <input
               type="password"
               value={formData.confirmPassword}
@@ -156,9 +158,9 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-cream/50 mt-6">
+        <p className="text-center text-sm text-text-muted mt-6">
           قبلاً ثبت‌نام کرده‌اید؟{" "}
-          <Link href="/auth/login" className="text-gold hover:text-gold-light transition-colors">
+          <Link href="/auth/login" className="text-accent-500 hover:text-accent-400 transition-colors">
             وارد شوید
           </Link>
         </p>

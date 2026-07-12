@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
+import { motion } from "framer-motion";
+import type { ReactNode } from "react";
 
 interface CardProps {
   children: ReactNode;
@@ -10,12 +11,17 @@ interface CardProps {
 }
 
 export function Card({ children, className = "", onClick, hover = false }: CardProps) {
+  const MotionDiv = motion.div as any;
+
   return (
-    <div
-      className={`glass-card p-6 ${hover ? "cursor-pointer transition-all duration-300 hover:border-gold/30 hover:shadow-lg hover:shadow-gold/5" : ""} ${className}`}
+    <MotionDiv
+      whileHover={hover ? { y: -4, scale: 1.01 } : undefined}
+      whileTap={hover ? { scale: 0.99 } : undefined}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className={`glass-card p-6 ${hover ? "cursor-pointer" : ""} ${className}`}
       onClick={onClick}
     >
       {children}
-    </div>
+    </MotionDiv>
   );
 }

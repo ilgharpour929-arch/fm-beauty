@@ -57,7 +57,7 @@ export default function AdminBlockedDatesPage() {
     } catch {}
   };
 
-  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-cream/50">در حال بارگذاری...</p></div>;
+  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-text-muted">در حال بارگذاری...</p></div>;
   if (user?.role !== "ADMIN") return null;
 
   const today = new Date().toISOString().split("T")[0];
@@ -65,11 +65,11 @@ export default function AdminBlockedDatesPage() {
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-cream mb-6">مسدودسازی روزها</h1>
+        <h1 className="text-2xl font-bold text-text-primary mb-6">مسدودسازی روزها</h1>
         {message && <p className="text-sm text-success mb-4 animate-fade-in">{message}</p>}
 
         <div className="glass-card p-6 mb-8">
-          <h2 className="text-lg font-semibold text-cream mb-4">مسدود کردن روز جدید</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-4">مسدود کردن روز جدید</h2>
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="date"
@@ -90,16 +90,16 @@ export default function AdminBlockedDatesPage() {
         </div>
 
         <div className="glass-card p-6">
-          <h2 className="text-lg font-semibold text-cream mb-4">روزهای مسدود شده</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-4">روزهای مسدود شده</h2>
           {blockedDates.length === 0 ? (
-            <p className="text-cream/50 text-center py-8">هیچ روزی مسدود نشده است</p>
+            <p className="text-text-muted text-center py-8">هیچ روزی مسدود نشده است</p>
           ) : (
             <div className="space-y-3">
               {blockedDates.map((bd) => (
                 <div key={bd.id} className="glass-card-dark p-4 flex items-center justify-between">
                   <div>
-                    <div className="font-medium text-cream">{bd.date}</div>
-                    {bd.reason && <div className="text-xs text-cream/50">{bd.reason}</div>}
+                    <div className="font-medium text-text-primary">{bd.date}</div>
+                    {bd.reason && <div className="text-xs text-text-muted">{bd.reason}</div>}
                   </div>
                   <button onClick={() => handleUnblock(bd.date)} className="btn-danger text-xs py-1.5 px-3">
                     آزاد کردن

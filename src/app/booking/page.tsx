@@ -7,6 +7,8 @@ export const metadata: Metadata = {
     "رزرو آنلاین نوبت اکستنشن مژه، لیفت مژه و لیفت ابرو | انتخاب تاریخ و ساعت دلخواه",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function BookingPage() {
   return <BookingClient />;
 }

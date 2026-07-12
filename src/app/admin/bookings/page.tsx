@@ -61,7 +61,7 @@ export default function AdminBookingsPage() {
     } catch {}
   };
 
-  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-cream/50">در حال بارگذاری...</p></div>;
+  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-text-muted">در حال بارگذاری...</p></div>;
   if (user?.role !== "ADMIN") return null;
 
   const statusLabels: Record<string, string> = {
@@ -76,7 +76,7 @@ export default function AdminBookingsPage() {
   return (
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-cream mb-6">مدیریت رزروها</h1>
+        <h1 className="text-2xl font-bold text-text-primary mb-6">مدیریت رزروها</h1>
 
         {message && <p className="text-success text-sm mb-4 animate-fade-in">{message}</p>}
 
@@ -85,7 +85,7 @@ export default function AdminBookingsPage() {
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/5 text-cream/50 text-right">
+                <tr className="border-b border-white/5 text-text-muted text-right">
                   <th className="p-4 font-medium">مشتری</th>
                   <th className="p-4 font-medium">تماس</th>
                   <th className="p-4 font-medium">خدمت</th>
@@ -99,17 +99,17 @@ export default function AdminBookingsPage() {
               <tbody>
                 {bookings.map((booking) => (
                   <tr key={booking.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="p-4 text-cream">{booking.user.firstName} {booking.user.lastName}</td>
-                    <td className="p-4 text-cream/70" dir="ltr">{booking.user.phone}</td>
-                    <td className="p-4 text-cream">{booking.service.name}</td>
-                    <td className="p-4 text-cream/70">{booking.date}</td>
-                    <td className="p-4 text-cream/70">{booking.startTime}</td>
-                    <td className="p-4 text-gold">{booking.depositAmount?.toLocaleString("fa-IR")} تومان</td>
+                    <td className="p-4 text-text-primary">{booking.user.firstName} {booking.user.lastName}</td>
+                    <td className="p-4 text-text-secondary" dir="ltr">{booking.user.phone}</td>
+                    <td className="p-4 text-text-primary">{booking.service.name}</td>
+                    <td className="p-4 text-text-secondary">{booking.date}</td>
+                    <td className="p-4 text-text-secondary">{booking.startTime}</td>
+                    <td className="p-4 text-accent-500">{booking.depositAmount?.toLocaleString("fa-IR")} تومان</td>
                     <td className="p-4">
                       <span className={`text-xs px-2 py-1 rounded-full ${
                         booking.status === "CONFIRMED" ? "bg-success/10 text-success" :
-                        booking.status === "WAITING_APPROVAL" ? "bg-gold/10 text-gold" :
-                        "bg-cream/10 text-cream/50"
+                        booking.status === "WAITING_APPROVAL" ? "bg-accent-500/10 text-accent-500" :
+                        "bg-text-primary/10 text-text-muted"
                       }`}>
                         {statusLabels[booking.status] || booking.status}
                       </span>
@@ -117,7 +117,7 @@ export default function AdminBookingsPage() {
                     <td className="p-4">
                       <div className="flex gap-2">
                         {booking.status === "PENDING_DEPOSIT" && (
-                          <span className="text-xs text-cream/30">منتظر فیش</span>
+                          <span className="text-xs text-text-muted/50">منتظر فیش</span>
                         )}
                         {booking.status === "WAITING_APPROVAL" && (
                           <>
@@ -126,7 +126,7 @@ export default function AdminBookingsPage() {
                           </>
                         )}
                         {booking.receiptImage && (
-                          <a href={booking.receiptImage} target="_blank" className="text-xs text-gold hover:text-gold-light">فیش</a>
+                          <a href={booking.receiptImage} target="_blank" className="text-xs text-accent-500 hover:text-accent-500-light">فیش</a>
                         )}
                         <button onClick={() => handleDelete(booking.id)} className="text-xs text-danger/50 hover:text-danger">حذف</button>
                       </div>
@@ -135,7 +135,7 @@ export default function AdminBookingsPage() {
                 ))}
                 {bookings.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="p-8 text-center text-cream/50">هیچ رزروی یافت نشد</td>
+                    <td colSpan={8} className="p-8 text-center text-text-muted">هیچ رزروی یافت نشد</td>
                   </tr>
                 )}
               </tbody>
@@ -145,40 +145,40 @@ export default function AdminBookingsPage() {
           {/* Mobile cards */}
           <div className="md:hidden space-y-3">
             {bookings.length === 0 && (
-              <p className="p-4 text-center text-cream/50">هیچ رزروی یافت نشد</p>
+              <p className="p-4 text-center text-text-muted">هیچ رزروی یافت نشد</p>
             )}
             {bookings.map((booking) => (
               <div key={booking.id} className="glass-card-dark p-4 space-y-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-medium text-cream">{booking.user.firstName} {booking.user.lastName}</div>
-                    <div className="text-xs text-cream/50" dir="ltr">{booking.user.phone}</div>
+                    <div className="font-medium text-text-primary">{booking.user.firstName} {booking.user.lastName}</div>
+                    <div className="text-xs text-text-muted" dir="ltr">{booking.user.phone}</div>
                   </div>
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     booking.status === "CONFIRMED" ? "bg-success/10 text-success" :
-                    booking.status === "WAITING_APPROVAL" ? "bg-gold/10 text-gold" :
-                    "bg-cream/10 text-cream/50"
+                    booking.status === "WAITING_APPROVAL" ? "bg-accent-500/10 text-accent-500" :
+                    "bg-text-primary/10 text-text-muted"
                   }`}>
                     {statusLabels[booking.status] || booking.status}
                   </span>
                 </div>
-                <div className="text-sm text-cream">{booking.service.name}</div>
-                <div className="flex justify-between text-xs text-cream/50">
+                <div className="text-sm text-text-primary">{booking.service.name}</div>
+                <div className="flex justify-between text-xs text-text-muted">
                   <span>{booking.date} | {booking.startTime}</span>
-                  <span className="text-gold">{booking.depositAmount?.toLocaleString("fa-IR")} تومان</span>
+                  <span className="text-accent-500">{booking.depositAmount?.toLocaleString("fa-IR")} تومان</span>
                 </div>
                 <div className="flex gap-2 pt-2 border-t border-white/5">
                   {booking.status === "PENDING_DEPOSIT" && (
-                    <span className="text-xs text-cream/30 py-1.5">منتظر فیش</span>
+                    <span className="text-xs text-text-muted/50 py-1.5">منتظر فیش</span>
                   )}
                   {booking.status === "WAITING_APPROVAL" && (
                     <>
-                      <button onClick={() => handleApprove(booking.id)} className="btn-primary text-xs py-1.5 px-3">تأیید</button>
-                      <button onClick={() => handleReject(booking.id)} className="btn-danger text-xs py-1.5 px-3">رد</button>
+                      <button onClick={() => handleApprove(booking.id)} className="btn-primary text-xs py-2.5 px-4">تأیید</button>
+                      <button onClick={() => handleReject(booking.id)} className="btn-danger text-xs py-2.5 px-4">رد</button>
                     </>
                   )}
                   {booking.receiptImage && (
-                    <a href={booking.receiptImage} target="_blank" className="text-xs text-gold underline py-1.5">مشاهده فیش</a>
+                    <a href={booking.receiptImage} target="_blank" className="text-xs text-accent-500 underline py-1.5">مشاهده فیش</a>
                   )}
                   <button onClick={() => handleDelete(booking.id)} className="text-xs text-danger/50 underline py-1.5 mr-auto">حذف</button>
                 </div>

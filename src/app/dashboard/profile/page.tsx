@@ -44,7 +44,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-cream/50">در حال بارگذاری...</p></div>;
+  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-text-muted">در حال بارگذاری...</p></div>;
 
   const user = session?.user as any;
 
@@ -52,21 +52,21 @@ export default function ProfilePage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">
         <div className="text-center mb-8 animate-float-up">
-          <h1 className="text-2xl font-bold text-cream">پروفایل</h1>
-          <p className="text-sm text-cream/50">ویرایش اطلاعات شخصی</p>
+          <h1 className="text-2xl font-bold text-text-primary">پروفایل</h1>
+          <p className="text-sm text-text-muted">ویرایش اطلاعات شخصی</p>
         </div>
 
         <div className="glass-card p-6 animate-float-up">
           <div className="text-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center text-dark-900 text-2xl font-bold mx-auto">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-accent-500 to-accent-300 flex items-center justify-center text-primary-900 text-2xl font-bold mx-auto">
               {user?.name?.charAt(0) || "U"}
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-cream/70 mb-1.5">نام</label>
+                <label className="block text-sm text-text-secondary mb-1.5">نام</label>
                 <input
                   type="text"
                   value={formData.firstName}
@@ -76,7 +76,7 @@ export default function ProfilePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm text-cream/70 mb-1.5">نام خانوادگی</label>
+                <label className="block text-sm text-text-secondary mb-1.5">نام خانوادگی</label>
                 <input
                   type="text"
                   value={formData.lastName}
@@ -88,9 +88,9 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm text-cream/70 mb-1.5">شماره تلفن</label>
+              <label className="block text-sm text-text-secondary mb-1.5">شماره تلفن</label>
               <input type="tel" value={user?.phone || ""} className="input-field" disabled dir="ltr" />
-              <p className="text-xs text-cream/30 mt-1">شماره تلفن قابل تغییر نیست</p>
+              <p className="text-xs text-text-muted/50 mt-1">شماره تلفن قابل تغییر نیست</p>
             </div>
 
             {message && (

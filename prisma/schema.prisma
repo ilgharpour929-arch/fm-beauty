@@ -98,15 +98,3 @@ model BlockedDate {
   reason    String   @default("")
   createdAt DateTime @default(now())
 }
-
-model Settings {
-  id    String @id @default("main")
-  phone String @default("")
-  email String @default("")
-  address String @default("")
-  workingHours String @default("")
-  instagram String @default("")
-  telegram String @default("")
-  whatsapp String @default("")
-  updatedAt DateTime @updatedAt
-}

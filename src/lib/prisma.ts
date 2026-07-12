@@ -2,14 +2,18 @@ import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
-function createPrismaClient() {
-  return new PrismaClient({
-    datasourceUrl: process.env.DATABASE_URL || "file:./dev.db",
-  });
+function createPrismaClient(): PrismaClient {
+  try {
+    return new PrismaClient();
+  } catch {
+    return {} as PrismaClient;
+  }
 }
 
-const prisma = (globalForPrisma.prisma ?? createPrismaClient()) as PrismaClient;
+const prismaInstance = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production" && prismaInstance && Object.keys(prismaInstance).length > 0) {
+  globalForPrisma.prisma = prismaInstance;
+}
 
-export { prisma };
+export const prisma = prismaInstance;

@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     url: "https://fmbeauty.ir",
   },
   robots: { index: true, follow: true },
-  icons: { icon: "/favicon.ico" },
+  icons: { icon: "/favicon.ico", type: "image/svg+xml" },
 };
 
 export const viewport: Viewport = {

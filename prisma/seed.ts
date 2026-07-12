@@ -26,12 +26,12 @@ async function main() {
   console.log("Admin created: 09120000000");
 
   const services = [
-    { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, image: "/images/services/placeholder.svg" },
-    { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, image: "/images/services/placeholder.svg" },
-    { id: "natural", name: "اکستنشن مژه نچرال", description: "مژه‌های طبیعی و ظریف برای روزمره", price: 1100000, image: "/images/services/placeholder.svg" },
-    { id: "repair", name: "ترمیم مژه", description: "ترمیم مژه‌های قبلی (نیاز به هماهنگی)", price: 1500000, image: "/images/services/placeholder.svg" },
-    { id: "lash-lift", name: "لیفت مژه و لمینیت", description: "فر طبیعی و ماندگار مژه‌ها بدون اکستنشن", price: 1200000, image: "/images/services/placeholder.svg" },
-    { id: "brow-lift", name: "لیفت ابرو", description: "مرتب‌سازی و فرم‌دهی ابروها", price: 1200000, image: "/images/services/placeholder.svg" },
+    { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, image: "/images/gallery/valyum.jpg" },
+    { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, image: "/images/gallery/spayki.jpg" },
+    { id: "natural", name: "اکستنشن مژه نچرال", description: "مژه‌های طبیعی و ظریف برای روزمره", price: 1100000, image: "/images/services/nacral.jpg" },
+    { id: "repair", name: "ترمیم مژه", description: "ترمیم مژه‌های قبلی (نیاز به هماهنگی)", price: 1500000, image: "/images/gallery/nemune-1.jpg" },
+    { id: "lash-lift", name: "لیفت مژه و لمینیت", description: "فر طبیعی و ماندگار مژه‌ها بدون اکستنشن", price: 1200000, image: "/images/services/lift-moje.jpg" },
+    { id: "brow-lift", name: "لیفت ابرو", description: "مرتب‌سازی و فرم‌دهی ابروها", price: 1200000, image: "/images/services/lift-abru.jpg" },
   ];
 
   for (const service of services) {

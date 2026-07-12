@@ -26,6 +26,7 @@ function getServiceImage(name: string): string {
     "نچرال": "/images/services/nacral.jpg",
     "لیفت مژه": "/images/services/lift-moje.jpg",
     "لیفت ابرو": "/images/services/lift-abru.jpg",
+    "ترمیم": "/images/gallery/nemune-1.jpg",
   };
   for (const [key, value] of Object.entries(map)) {
     if (name.includes(key)) return value;

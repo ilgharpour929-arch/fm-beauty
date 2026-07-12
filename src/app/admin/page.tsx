@@ -60,6 +60,7 @@ export default function AdminPage() {
     { href: "/admin/services", label: "مدیریت خدمات", desc: "ویرایش قیمت‌ها و خدمات", icon: "💄" },
     { href: "/admin/blocked-dates", label: "مسدودسازی روزها", desc: "مسدود کردن روزهای خاص", icon: "🚫" },
     { href: "/admin/users", label: "کاربران", desc: "لیست کاربران ثبت‌نام شده", icon: "👥" },
+    { href: "/admin/settings", label: "تنظیمات ارتباطی", desc: "ویرایش شماره تماس، آدرس و شبکه‌های اجتماعی", icon: "⚙️" },
   ];
 
   const formatPrice = (v: number) => v.toLocaleString("fa-IR");

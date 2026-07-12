@@ -1,12 +1,46 @@
+"use client";
+
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export const metadata: Metadata = {
-  title: "تماس با ما",
-  description: "راه‌های ارتباطی با FM Beauty. پاسخگویی همه روزه از ۹ صبح تا ۸ شب.",
-};
+interface Settings {
+  phone: string;
+  email: string;
+  address: string;
+  workingHours: string;
+  instagram: string;
+  telegram: string;
+  whatsapp: string;
+}
 
 export default function ContactPage() {
+  const [settings, setSettings] = useState<Settings>({
+    phone: "",
+    email: "",
+    address: "",
+    workingHours: "همه روزه از ۹ صبح تا ۸ شب",
+    instagram: "",
+    telegram: "",
+    whatsapp: "",
+  });
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.phone || data.email) setSettings(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const contactItems = [
+    { icon: "📍", title: "آدرس", desc: settings.address || "—" },
+    { icon: "📞", title: "تلفن تماس", desc: settings.phone || "—" },
+    { icon: "✉️", title: "ایمیل", desc: settings.email || "—" },
+    { icon: "⏰", title: "ساعت کاری", desc: settings.workingHours },
+  ];
+
   return (
     <div className="pt-24 px-6 pb-20">
       <div className="max-w-7xl mx-auto">
@@ -19,17 +53,11 @@ export default function ContactPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <div className="space-y-4">
-            {[
-              { icon: "📍", title: "آدرس", desc: "تهران، ایران" },
-              { icon: "📞", title: "تلفن تماس", desc: "۰۹۱۲ XXX XXXX" },
-              { icon: "✉️", title: "ایمیل", desc: "info@fmbeauty.ir" },
-              { icon: "⏰", title: "ساعت کاری", desc: "همه روزه از ۹ صبح تا ۸ شب", note: "جمعه‌ها تعطیل" },
-            ].map((info) => (
+            {contactItems.map((info) => (
               <div key={info.title} className="glass-card p-6">
                 <div className="text-2xl mb-2">{info.icon}</div>
                 <h3 className="font-semibold mb-1">{info.title}</h3>
                 <p className="text-sm text-[var(--color-muted)]">{info.desc}</p>
-                {info.note && <p className="text-xs text-[var(--color-warning)] mt-1">{info.note}</p>}
               </div>
             ))}
           </div>

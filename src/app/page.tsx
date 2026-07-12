@@ -8,15 +8,24 @@ export const metadata: Metadata = {
   description: "اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت مژه و لیفت ابرو با بهترین کیفیت در تهران | رزرو آنلاین نوبت",
 };
 
+const STATIC_SERVICES = [
+  { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, duration: 90 },
+  { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, duration: 90 },
+  { id: "natural", name: "اکستنشن مژه نچرال", description: "مژه‌های طبیعی و ظریف برای روزمره", price: 1100000, duration: 90 },
+  { id: "repair", name: "ترمیم مژه", description: "ترمیم مژه‌های قبلی (نیاز به هماهنگی)", price: 1500000, duration: 90 },
+  { id: "lash-lift", name: "لیفت مژه و لمینیت", description: "فر طبیعی و ماندگار مژه‌ها بدون اکستنشن", price: 1200000, duration: 90 },
+  { id: "brow-lift", name: "لیفت ابرو", description: "مرتب‌سازی و فرم‌دهی ابروها", price: 1200000, duration: 90 },
+];
+
 async function getServices() {
   try {
-    return await prisma.service.findMany({
+    const services = await prisma.service.findMany({
       where: { isActive: true },
       orderBy: { price: "desc" },
     });
-  } catch {
-    return [];
-  }
+    if (services.length > 0) return services;
+  } catch {}
+  return STATIC_SERVICES;
 }
 
 function getServiceImage(name: string): string {

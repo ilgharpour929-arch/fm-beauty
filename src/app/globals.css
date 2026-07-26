@@ -26,7 +26,7 @@
   --color-accent-3: #7DD3FC;
 
   --font-display: 'Cormorant Garamond', 'Cormorant', 'Georgia', serif;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
 }
 

@@ -52,17 +52,18 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="min-h-[90vh] flex items-center px-6 pt-32 pb-20 relative">
         <div className="max-w-7xl mx-auto w-full relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/10 text-xs text-[var(--color-accent)] mb-6">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
-            </svg>
-            سالن زیبایی حرفه‌ای
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-[var(--color-accent)]/30 bg-gradient-to-r from-[var(--color-accent)]/15 via-[var(--color-accent-2)]/10 to-transparent text-xs font-medium text-[var(--color-accent-2)] mb-8 shadow-lg shadow-[var(--color-accent)]/10 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-[var(--color-accent-2)] animate-pulse" />
+            مرکز تخصصی اکستنشن مژه و ابرو فاطمه محمدی در ارومیه
           </div>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] tracking-[-0.02em] mb-6">
-            زیبایی تو،<br />هنر ماست
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tight mb-8">
+            <span className="block text-[var(--color-fg)]">زیباییِ چشم‌های تو،</span>
+            <span className="bg-gradient-to-r from-[var(--color-accent)] via-[var(--color-accent-2)] to-[var(--color-accent-3)] bg-clip-text text-transparent">
+              تخصص و هنرِ ماست
+            </span>
           </h1>
-          <p className="text-lg text-[var(--color-muted)] max-w-lg leading-relaxed mb-8">
-            خدمات تخصصی اکستنشن مژه، لیفت و لمینیت با بالاترین کیفیت. رزرو آنلاین، پرداخت آسان، تجربه‌ای لوکس.
+          <p className="text-lg md:text-xl text-[var(--color-muted)] max-w-xl leading-relaxed mb-10 font-normal">
+            ارائه تخصصی‌ترین خدمات اکستنشن مژه والیوم، اسپایکی، نچرال و لیفت ابرو با برترین مواد اروپایی. رزرو آنلاین بدون معطلی.
           </p>
           <div className="flex gap-4 flex-wrap">
             <Link href="/booking" className="btn-primary text-lg px-10 py-3.5">

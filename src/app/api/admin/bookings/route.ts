@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 export async function GET() {
   const session = await auth();
@@ -9,28 +10,16 @@ export async function GET() {
   }
 
   try {
-    const bookings = await prisma.booking.findMany({
+    const dbBookings = await prisma.booking.findMany({
       include: {
         user: { select: { firstName: true, lastName: true, phone: true } },
         service: { select: { name: true, price: true } },
       },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(bookings);
-  } catch {
-    return NextResponse.json([
-      {
-        id: "bk-demo-1",
-        date: new Date().toISOString().split("T")[0],
-        startTime: "10:30 - 12:00",
-        status: "WAITING_APPROVAL",
-        depositAmount: 450000,
-        note: "توضیحات رزرو آزمایشی",
-        receiptImage: "",
-        user: { firstName: "سارا", lastName: "احمدی", phone: "09140001122" },
-        service: { name: "اکستنشن مژه والیوم", price: 1500000 },
-        createdAt: new Date().toISOString()
-      }
-    ]);
-  }
+    if (dbBookings && dbBookings.length > 0) return NextResponse.json(dbBookings);
+  } catch {}
+
+  const memBookings = memoryStore.getBookings();
+  return NextResponse.json(memBookings);
 }

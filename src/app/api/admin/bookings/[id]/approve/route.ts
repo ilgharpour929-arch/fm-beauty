@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 export async function POST(
   _request: NextRequest,
@@ -12,10 +13,15 @@ export async function POST(
   }
 
   const { id } = await params;
-  const booking = await prisma.booking.update({
-    where: { id },
-    data: { status: "CONFIRMED" },
-  });
+  memoryStore.updateBookingStatus(id, "CONFIRMED");
 
-  return NextResponse.json(booking);
+  try {
+    const booking = await prisma.booking.update({
+      where: { id },
+      data: { status: "CONFIRMED" },
+    });
+    return NextResponse.json(booking);
+  } catch {
+    return NextResponse.json({ success: true, status: "CONFIRMED" });
+  }
 }

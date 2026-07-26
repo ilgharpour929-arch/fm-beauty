@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -28,6 +29,11 @@ export async function POST(request: NextRequest) {
       service = (staticServices[serviceId] as any) || { name: "خدمت زیبایی مژه", price: 1500000 };
     }
 
+    // Check memoryStore for slot conflicts
+    if (memoryStore.isSlotBooked(date, startTime)) {
+      return NextResponse.json({ error: "این تاریخ و ساعت قبلاً رزرو شده است. لطفاً زمان دیگری را انتخاب کنید." }, { status: 409 });
+    }
+
     let existingBooking = null;
     try {
       existingBooking = await prisma.booking.findUnique({
@@ -35,17 +41,44 @@ export async function POST(request: NextRequest) {
       });
     } catch {}
 
-    if (existingBooking && ["WAITING_APPROVAL", "CONFIRMED"].includes(existingBooking.status)) {
-      return NextResponse.json({ error: "این زمان قبلاً رزرو شده است" }, { status: 409 });
+    if (existingBooking && ["PENDING_DEPOSIT", "WAITING_APPROVAL", "CONFIRMED"].includes(existingBooking.status)) {
+      return NextResponse.json({ error: "این تاریخ و ساعت قبلاً رزرو شده است. لطفاً زمان دیگری را انتخاب کنید." }, { status: 409 });
     }
 
     const depositAmount = Math.round(service.price * 0.3);
     const userId = (session.user as any)?.id || "user-id";
+    const userName = session.user?.name || "مشتری آنلاین";
+    const userPhone = (session.user as any)?.phone || "09120000000";
 
-    let bookingId: string = "bk-" + Date.now();
+    const bookingId = "bk-" + Date.now();
+
+    // Store in memoryStore for real admin dashboard visibility
+    memoryStore.addBooking({
+      id: bookingId,
+      userId,
+      serviceId,
+      date,
+      startTime,
+      status: "PENDING_DEPOSIT",
+      depositAmount,
+      note: note || "",
+      receiptImage: "",
+      createdAt: new Date().toISOString(),
+      user: {
+        firstName: userName.split(" ")[0] || "مشتری",
+        lastName: userName.split(" ")[1] || "گرامی",
+        phone: userPhone,
+      },
+      service: {
+        name: service.name,
+        price: service.price,
+      },
+    });
+
     try {
-      const booking = await prisma.booking.create({
+      await prisma.booking.create({
         data: {
+          id: bookingId,
           userId,
           serviceId,
           date,
@@ -55,7 +88,6 @@ export async function POST(request: NextRequest) {
           note: note || "",
         },
       });
-      bookingId = booking.id;
     } catch (dbError) {
       console.error("Prisma booking creation error:", dbError);
     }

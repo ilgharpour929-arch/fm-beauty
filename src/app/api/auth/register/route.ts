@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 function normalizePhone(phone: string): string {
   const persianNumbers = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
@@ -27,7 +28,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "رمز عبور باید حداقل ۶ کاراکتر باشد" }, { status: 400 });
     }
 
-    // Try database save if available
+    const newUser = {
+      id: "usr-" + Date.now(),
+      firstName,
+      lastName,
+      phone,
+      role: "CUSTOMER",
+      createdAt: new Date().toISOString(),
+    };
+
+    memoryStore.addUser(newUser);
+
     try {
       const existing = await prisma.user.findFirst({
         where: { OR: [{ phone }, { phone: rawPhone }] },

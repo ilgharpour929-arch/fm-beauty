@@ -35,7 +35,7 @@ export function LoginForm() {
     if (sessionData?.user?.role === "ADMIN") {
       router.push("/admin");
     } else {
-      router.push("/");
+      router.push("/dashboard");
     }
     router.refresh();
   }

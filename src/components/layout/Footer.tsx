@@ -40,8 +40,9 @@ export function Footer() {
             <h3 className="font-medium text-[var(--color-fg)] mb-3">ارتباط با ما</h3>
             <ul className="space-y-2 text-sm text-[var(--color-muted)]">
               <li>فاطمه محمدی</li>
+              <li>ارومیه — آدرس دقیق پس از رزرو</li>
               <li>ساعات کاری: ۹:۰۰ تا ۲۰:۰۰</li>
-              <li>تماس: ۰۹۱۲×××××××</li>
+              <li>تماس: ۰۹۱۴۱۸۹۸۰۰۶</li>
               <li>اینستاگرام: @fm_beauty</li>
             </ul>
           </div>

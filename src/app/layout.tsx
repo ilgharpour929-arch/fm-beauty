@@ -10,10 +10,10 @@ export const metadata: Metadata = {
     template: "%s | FM Beauty",
   },
   description:
-    "سالن زیبایی تخصصی مژه فاطمه محمدی | اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت مژه و لیفت ابرو با بهترین کیفیت در تهران",
+    "سالن زیبایی تخصصی مژه فاطمه محمدی | اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت مژه و لیفت ابرو با بهترین کیفیت در ارومیه | رزرو آنلاین نوبت",
   keywords: [
-    "اکستنشن مژه", "لیفت مژه", "لیفت ابرو", "سالن زیبایی",
-    "مژه", "فاطمه محمدی", "FM Beauty", "زیبایی", "تهران",
+    "اکستنشن مژه", "لیفت مژه", "لیفت ابرو", "سالن زیبایی ارومیه",
+    "اکستنشن مژه ارومیه", "لیفت مژه ارومیه", "فاطمه محمدی", "FM Beauty", "ارومیه",
   ],
   authors: [{ name: "Fatemeh Mohammadi" }],
   creator: "FM Beauty",
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fa_IR",
     siteName: "FM Beauty",
-    title: "FM Beauty | سالن زیبایی حرفه‌ای مژه و ابرو",
-    description: "اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت مژه و لیفت ابرو",
+    title: "FM Beauty | سالن زیبایی تخصصی مژه و ابرو در ارومیه",
+    description: "اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت مژه و لیفت ابرو تخصصی در ارومیه با رزرو آنلاین نوبت",
     url: "https://fmbeauty.ir",
   },
   robots: { index: true, follow: true },
@@ -44,8 +44,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
         <meta name="google" content="notranslate" />
-        <meta name="geo.region" content="IR" />
-        <meta name="geo.placename" content="Tehran" />
+        <meta name="geo.region" content="IR-02" />
+        <meta name="geo.placename" content="Urmia" />
       </head>
       <body className="min-h-screen flex flex-col">
         <div className="floating-orbs" aria-hidden="true">

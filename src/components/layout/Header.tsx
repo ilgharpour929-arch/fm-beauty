@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 
 const Logo = () => (
   <svg width="32" height="32" viewBox="0 0 120 120" fill="none">
@@ -31,6 +32,7 @@ const navLinks = [
 ];
 
 export function Header() {
+  const { data: session } = useSession();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -40,11 +42,13 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const isAdmin = session?.user && (session.user as any).role === "ADMIN";
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-350 ${
         scrolled
-          ? "bg-[rgba(26,10,30,0.9)] backdrop-blur-[20px] border-b border-[rgba(212,163,115,0.15)] py-3 shadow-lg"
+          ? "bg-[rgba(11,17,32,0.92)] backdrop-blur-[20px] border-b border-[rgba(139,92,246,0.2)] py-3 shadow-lg"
           : "bg-transparent py-5"
       }`}
     >
@@ -69,9 +73,31 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/auth/login" className="btn-ghost !py-2 !px-4 text-sm hidden sm:inline-flex">ورود</Link>
-          <Link href="/auth/register" className="btn-primary !py-2 !px-5 text-sm hidden sm:inline-flex">ثبت نام</Link>
-          
+          {session ? (
+            <>
+              {isAdmin ? (
+                <Link href="/admin" className="btn-primary !py-2 !px-4 text-sm hidden sm:inline-flex">
+                  پنل مدیریت
+                </Link>
+              ) : (
+                <Link href="/dashboard" className="btn-ghost !py-2 !px-4 text-sm hidden sm:inline-flex">
+                  حساب من
+                </Link>
+              )}
+              <button
+                onClick={() => signOut()}
+                className="text-xs text-[var(--color-muted)] hover:text-[var(--color-danger)] transition-colors hidden sm:inline-block px-2"
+              >
+                خروج
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" className="btn-ghost !py-2 !px-4 text-sm hidden sm:inline-flex">ورود</Link>
+              <Link href="/auth/register" className="btn-primary !py-2 !px-5 text-sm hidden sm:inline-flex">ثبت نام</Link>
+            </>
+          )}
+
           {/* Hamburger button */}
           <button
             className="md:hidden flex flex-col justify-center items-center gap-1.5 w-10 h-10 rounded-xl bg-[rgba(212,163,115,0.1)] border border-[rgba(212,163,115,0.2)] text-[var(--color-fg)] cursor-pointer hover:bg-[rgba(212,163,115,0.2)] transition-colors"
@@ -102,9 +128,22 @@ export function Header() {
               {link.label}
             </Link>
           ))}
-          <div className="flex gap-3 pt-3 border-t border-[rgba(212,163,115,0.1)] sm:hidden">
-            <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="btn-ghost flex-1 !py-2.5 text-sm text-center">ورود</Link>
-            <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="btn-primary flex-1 !py-2.5 text-sm text-center">ثبت نام</Link>
+          <div className="flex gap-3 pt-3 border-t border-[rgba(139,92,246,0.15)] sm:hidden">
+            {session ? (
+              <>
+                {isAdmin ? (
+                  <Link href="/admin" onClick={() => setMenuOpen(false)} className="btn-primary flex-1 !py-2.5 text-sm text-center">پنل مدیریت</Link>
+                ) : (
+                  <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="btn-ghost flex-1 !py-2.5 text-sm text-center">حساب من</Link>
+                )}
+                <button onClick={() => { setMenuOpen(false); signOut(); }} className="btn-ghost !py-2.5 text-sm text-[var(--color-danger)]">خروج</button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="btn-ghost flex-1 !py-2.5 text-sm text-center">ورود</Link>
+                <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="btn-primary flex-1 !py-2.5 text-sm text-center">ثبت نام</Link>
+              </>
+            )}
           </div>
         </div>
       </div>

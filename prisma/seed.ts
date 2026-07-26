@@ -12,18 +12,21 @@ async function main() {
   const adminPassword = await bcrypt.hash("admin123", 12);
 
   await prisma.user.upsert({
-    where: { phone: "09120000000" },
-    update: {},
+    where: { phone: "09141898006" },
+    update: {
+      password: adminPassword,
+      role: "ADMIN",
+    },
     create: {
       firstName: "فاطمه",
       lastName: "محمدی",
-      phone: "09120000000",
+      phone: "09141898006",
       password: adminPassword,
       role: "ADMIN",
     },
   });
 
-  console.log("Admin created: 09120000000");
+  console.log("Admin created: 09141898006");
 
   const services = [
     { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, image: "/images/gallery/valyum.jpg" },

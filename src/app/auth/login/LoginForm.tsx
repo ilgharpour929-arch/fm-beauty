@@ -30,7 +30,13 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/");
+    const resSession = await fetch("/api/auth/session");
+    const sessionData = await resSession.json();
+    if (sessionData?.user?.role === "ADMIN") {
+      router.push("/admin");
+    } else {
+      router.push("/");
+    }
     router.refresh();
   }
 

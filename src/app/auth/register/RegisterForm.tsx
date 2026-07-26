@@ -26,6 +26,8 @@ export function RegisterForm() {
     e.preventDefault();
     setError("");
 
+    const cleanPhone = formData.phone.trim().replace(/\s+/g, "");
+
     if (formData.password !== formData.confirmPassword) {
       setError("رمز عبور و تکرار آن مطابقت ندارند");
       return;
@@ -45,7 +47,7 @@ export function RegisterForm() {
         body: JSON.stringify({
           firstName: formData.firstName,
           lastName: formData.lastName,
-          phone: formData.phone,
+          phone: cleanPhone,
           password: formData.password,
         }),
       });
@@ -59,7 +61,7 @@ export function RegisterForm() {
       }
 
       const result = await signIn("credentials", {
-        phone: formData.phone,
+        phone: cleanPhone,
         password: formData.password,
         redirect: false,
       });

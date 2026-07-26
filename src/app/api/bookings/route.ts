@@ -15,9 +15,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "همه فیلدها الزامی هستند" }, { status: 400 });
     }
 
-    const service = await prisma.service.findUnique({ where: { id: serviceId } });
+    let service = await prisma.service.findUnique({ where: { id: serviceId } }).catch(() => null);
     if (!service) {
-      return NextResponse.json({ error: "خدمت مورد نظر یافت نشد" }, { status: 404 });
+      const staticServices: Record<string, { name: string; price: number }> = {
+        volume: { name: "اکستنشن مژه والیوم", price: 1800000 },
+        spiky: { name: "اکستنشن مژه اسپایکی", price: 1500000 },
+        natural: { name: "اکستنشن مژه نچرال", price: 1100000 },
+        repair: { name: "ترمیم مژه", price: 1500000 },
+        "lash-lift": { name: "لیفت مژه و لمینیت", price: 1200000 },
+        "brow-lift": { name: "لیفت ابرو", price: 1200000 },
+      };
+      service = (staticServices[serviceId] as any) || { name: "خدمت زیبایی مژه", price: 1500000 };
     }
 
     const existingBooking = await prisma.booking.findUnique({

@@ -3,6 +3,16 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+function normalizePhone(phone: string): string {
+  const persianNumbers = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
+  const arabicNumbers  = [/٠/g, /١/g, /٢/g, /٣/g, /٤/g, /٥/g, /٦/g, /٧/g, /٨/g, /٩/g];
+  let res = phone.trim().replace(/\s+/g, "").replace(/-/g, "");
+  for (let i = 0; i < 10; i++) {
+    res = res.replace(persianNumbers[i], String(i)).replace(arabicNumbers[i], String(i));
+  }
+  return res;
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -14,11 +24,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.phone || !credentials?.password) return null;
 
-        const phone = credentials.phone as string;
+        const phone = normalizePhone(credentials.phone as string);
         const password = credentials.password as string;
 
-        const user = await prisma.user.findUnique({
-          where: { phone },
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { phone },
+              { phone: credentials.phone as string },
+            ],
+          },
         });
 
         if (!user) return null;

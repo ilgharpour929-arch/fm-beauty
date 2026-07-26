@@ -71,11 +71,25 @@ function PaymentForm() {
     }
   }
 
-  const bankInfo = {
-    cardNumber: "۶۰۳۷-۷۵۹۱-xxxx-xxxx",
+  const [bankInfo, setBankInfo] = useState({
+    cardNumber: "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
     accountHolder: "فاطمه محمدی",
     bank: "بانک ملی",
-  };
+  });
+
+  useEffect(() => {
+    const savedCard = localStorage.getItem("bank_cardNumber");
+    const savedHolder = localStorage.getItem("bank_accountHolder");
+    const savedBank = localStorage.getItem("bank_name");
+
+    if (savedCard || savedHolder || savedBank) {
+      setBankInfo({
+        cardNumber: savedCard || "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
+        accountHolder: savedHolder || "فاطمه محمدی",
+        bank: savedBank || "بانک ملی",
+      });
+    }
+  }, []);
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">

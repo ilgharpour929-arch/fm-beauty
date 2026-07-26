@@ -49,6 +49,7 @@ export default function AdminPage() {
   const adminLinks = [
     { href: "/admin/bookings", label: "مدیریت رزروها", desc: "مشاهده و تأیید رزروها", icon: icons.bookings },
     { href: "/admin/services", label: "مدیریت خدمات", desc: "ویرایش قیمت‌ها و خدمات", icon: icons.services },
+    { href: "/admin/settings", label: "اطلاعات کارت و پرداخت", desc: "تغییر شماره کارت، شبا و نام بانک", icon: icons.services },
     { href: "/admin/blocked-dates", label: "مسدودسازی روزها", desc: "مسدود کردن روزهای خاص", icon: icons.blocked },
     { href: "/admin/users", label: "کاربران", desc: "لیست کاربران ثبت‌نام شده", icon: icons.users },
   ];

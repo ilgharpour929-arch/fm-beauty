@@ -66,12 +66,6 @@ export function RegisterForm() {
         redirect: false,
       });
 
-      if (result?.error) {
-        setError("ثبت‌نام انجام شد اما ورود خودکار ناموفق بود");
-        setLoading(false);
-        return;
-      }
-
       router.push("/");
       router.refresh();
     } catch {

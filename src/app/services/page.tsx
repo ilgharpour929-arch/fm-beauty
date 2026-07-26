@@ -5,16 +5,16 @@ import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "خدمات",
-  description: "مشاهده خدمات تخصصی FM Beauty: اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت و لمینیت",
+  description: "مشاهده خدمات تخصصی FM Beauty: اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت مژه و لمینیت، لیفت ابرو",
 };
 
 const STATIC_SERVICES = [
-  { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, duration: 90 },
-  { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, duration: 90 },
-  { id: "natural", name: "اکستنشن مژه نچرال", description: "مژه‌های طبیعی و ظریف برای روزمره", price: 1100000, duration: 90 },
-  { id: "repair", name: "ترمیم مژه", description: "ترمیم مژه‌های قبلی (نیاز به هماهنگی)", price: 1500000, duration: 90 },
-  { id: "lash-lift", name: "لیفت مژه و لمینیت", description: "فر طبیعی و ماندگار مژه‌ها بدون اکستنشن", price: 1200000, duration: 90 },
-  { id: "brow-lift", name: "لیفت ابرو", description: "مرتب‌سازی و فرم‌دهی ابروها", price: 1200000, duration: 90 },
+  { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, duration: 90, image: "/images/gallery/valyum.jpg" },
+  { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, duration: 90, image: "/images/gallery/spayki.jpg" },
+  { id: "natural", name: "اکستنشن مژه نچرال", description: "مژه‌های طبیعی و ظریف برای روزمره", price: 1100000, duration: 90, image: "/images/services/nacral.jpg" },
+  { id: "repair", name: "ترمیم مژه", description: "ترمیم مژه‌های قبلی (نیاز به هماهنگی)", price: 1500000, duration: 90, image: "/images/gallery/nemune-1.jpg" },
+  { id: "lash-lift", name: "لیفت مژه و لمینیت", description: "فر طبیعی و ماندگار مژه‌ها بدون اکستنشن", price: 1200000, duration: 90, image: "/images/services/lift-moje.jpg" },
+  { id: "brow-lift", name: "لیفت ابرو", description: "مرتب‌سازی و فرم‌دهی ابروها", price: 1200000, duration: 90, image: "/images/services/lift-abru.jpg" },
 ];
 
 async function getServices() {
@@ -23,23 +23,14 @@ async function getServices() {
       where: { isActive: true },
       orderBy: { price: "desc" },
     });
-    if (services.length > 0) return services;
+    if (services.length > 0) {
+      return services.map((s) => ({
+        ...s,
+        image: s.image || "/images/gallery/nemune-1.jpg",
+      }));
+    }
   } catch {}
   return STATIC_SERVICES;
-}
-
-function getServiceImage(name: string): string {
-  const map: Record<string, string> = {
-    "والیوم": "/images/gallery/valyum.jpg",
-    "اسپایکی": "/images/gallery/spayki.jpg",
-    "نچرال": "/images/services/nacral.jpg",
-    "لیفت مژه": "/images/services/lift-moje.jpg",
-    "لیفت ابرو": "/images/services/lift-abru.jpg",
-  };
-  for (const [key, value] of Object.entries(map)) {
-    if (name.includes(key)) return value;
-  }
-  return "/images/gallery/nemune-1.jpg";
 }
 
 export default async function ServicesPage() {
@@ -57,10 +48,10 @@ export default async function ServicesPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service) => (
-            <div key={service.id} className="glass-card overflow-hidden group hover:-translate-y-1 transition-all duration-350">
+            <div key={service.id} className="glass-card overflow-hidden group hover:-translate-y-1 transition-all duration-350 flex flex-col">
               <div className="relative h-56 overflow-hidden">
                 <Image
-                  src={getServiceImage(service.name)}
+                  src={service.image || "/images/gallery/nemune-1.jpg"}
                   alt={service.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -68,15 +59,18 @@ export default async function ServicesPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)] via-[var(--color-bg)]/30 to-transparent" />
               </div>
-              <div className="p-6">
+              <div className="p-6 flex-1 flex flex-col">
                 <h3 className="text-xl font-semibold mb-2">{service.name}</h3>
-                <p className="text-sm text-[var(--color-muted)] mb-4">{service.description}</p>
-                <div className="flex items-center justify-between">
+                <p className="text-sm text-[var(--color-muted)] mb-4 flex-1">{service.description}</p>
+                <div className="flex items-center justify-between mb-4">
                   <span className="font-mono text-lg font-semibold text-[var(--color-accent)]">
                     {service.price.toLocaleString("fa-IR")} تومان
                   </span>
                   <span className="text-xs text-[var(--color-muted)]/70">{service.duration} دقیقه</span>
                 </div>
+                <Link href={`/booking?service=${service.id}`} className="btn-primary w-full text-center">
+                  رزرو این خدمت
+                </Link>
               </div>
             </div>
           ))}

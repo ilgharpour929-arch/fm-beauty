@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 const STATIC_SERVICES = [
-  { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, duration: 90 },
-  { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, duration: 90 },
-  { id: "natural", name: "اکستنشن مژه نچرال", description: "مژه‌های طبیعی و ظریف برای روزمره", price: 1100000, duration: 90 },
-  { id: "repair", name: "ترمیم مژه", description: "ترمیم مژه‌های قبلی (نیاز به هماهنگی)", price: 1500000, duration: 90 },
-  { id: "lash-lift", name: "لیفت مژه و لمینیت", description: "فر طبیعی و ماندگار مژه‌ها بدون اکستنشن", price: 1200000, duration: 90 },
-  { id: "brow-lift", name: "لیفت ابرو", description: "مرتب‌سازی و فرم‌دهی ابروها", price: 1200000, duration: 90 },
+  { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, duration: 90, image: "/images/gallery/valyum.jpg" },
+  { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, duration: 90, image: "/images/gallery/spayki.jpg" },
+  { id: "natural", name: "اکستنشن مژه نچرال", description: "مژه‌های طبیعی و ظریف برای روزمره", price: 1100000, duration: 90, image: "/images/services/nacral.jpg" },
+  { id: "repair", name: "ترمیم مژه", description: "ترمیم مژه‌های قبلی (نیاز به هماهنگی)", price: 1500000, duration: 90, image: "/images/gallery/nemune-1.jpg" },
+  { id: "lash-lift", name: "لیفت مژه و لمینیت", description: "فر طبیعی و ماندگار مژه‌ها بدون اکستنشن", price: 1200000, duration: 90, image: "/images/services/lift-moje.jpg" },
+  { id: "brow-lift", name: "لیفت ابرو", description: "مرتب‌سازی و فرم‌دهی ابروها", price: 1200000, duration: 90, image: "/images/services/lift-abru.jpg" },
 ];
 
 async function getServices() {
@@ -28,20 +28,21 @@ async function getServices() {
   return STATIC_SERVICES;
 }
 
-function getServiceImage(name: string): string {
-  const map: Record<string, string> = {
-    "والیوم": "/images/gallery/valyum.jpg",
-    "اسپایکی": "/images/gallery/spayki.jpg",
-    "نچرال": "/images/services/nacral.jpg",
-    "لیفت مژه": "/images/services/lift-moje.jpg",
-    "لیفت ابرو": "/images/services/lift-abru.jpg",
-    "ترمیم": "/images/gallery/nemune-1.jpg",
-  };
-  for (const [key, value] of Object.entries(map)) {
-    if (name.includes(key)) return value;
-  }
-  return "/images/gallery/nemune-1.jpg";
-}
+const processSteps = [
+  { num: "01", title: "انتخاب خدمت", desc: "از میان خدمات تخصصی، مورد دلخواه خود را انتخاب کنید." },
+  { num: "02", title: "انتخاب زمان", desc: "تاریخ و ساعت مناسب را از اسلات‌های آزاد انتخاب کنید." },
+  { num: "03", title: "پرداخت", desc: "با کارت‌به‌کارت، پیش‌پرداخت را واریز و رسید را بارگذاری کنید." },
+  { num: "04", title: "تأیید رزرو", desc: "پس از تأیید مدیر، رزرو شما قطعی می‌شود." },
+];
+
+const galleryImages = [
+  { src: "/images/gallery/nemune-1.jpg", alt: "نمونه کار FM Beauty" },
+  { src: "/images/gallery/nemune-2.jpg", alt: "نمونه کار اکستنشن مژه" },
+  { src: "/images/gallery/nemune-3.jpg", alt: "نمونه کار لیفت مژه" },
+  { src: "/images/gallery/spayki.jpg", alt: "اکستنشن مژه اسپایکی" },
+  { src: "/images/gallery/valyum.jpg", alt: "اکستنشن مژه والیوم" },
+  { src: "/images/services/lift-moje.jpg", alt: "لیفت مژه و لمینیت" },
+];
 
 export default async function HomePage() {
   const services = await getServices();
@@ -49,10 +50,13 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="min-h-screen flex items-center px-6 pt-32 pb-20 relative">
+      <section className="min-h-[90vh] flex items-center px-6 pt-32 pb-20 relative">
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/10 text-xs text-[var(--color-accent)] mb-6">
-            ✨ سالن زیبایی حرفه‌ای
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
+            </svg>
+            سالن زیبایی حرفه‌ای
           </div>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] tracking-[-0.02em] mb-6">
             زیبایی تو،<br />هنر ماست
@@ -64,13 +68,16 @@ export default async function HomePage() {
             <Link href="/booking" className="btn-primary text-lg px-10 py-3.5">
               رزرو آنلاین
             </Link>
+            <Link href="/services" className="btn-ghost text-lg px-10 py-3.5">
+              مشاهده خدمات
+            </Link>
           </div>
           <p className="text-sm text-[var(--color-muted)] mt-4">توسط فاطمه محمدی — بیش از ۵ سال تجربه حرفه‌ای</p>
         </div>
       </section>
 
       {/* Services */}
-      <section className="py-20 px-6">
+      <section id="services" className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <span className="inline-block text-xs font-semibold tracking-[0.1em] uppercase text-[var(--color-accent)] mb-4 font-sans">خدمات تخصصی</span>
@@ -82,7 +89,7 @@ export default async function HomePage() {
               <div key={service.id} className="glass-card overflow-hidden group hover:-translate-y-1 transition-all duration-350">
                 <div className="relative h-48 overflow-hidden">
                   <Image
-                    src={getServiceImage(service.name)}
+                    src={service.image || "/images/gallery/nemune-1.jpg"}
                     alt={service.name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -99,6 +106,63 @@ export default async function HomePage() {
                     </span>
                     <span className="text-xs text-[var(--color-muted)]/70">{service.duration} دقیقه</span>
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Link href="/booking" className="btn-primary text-lg px-10 py-3.5">
+              رزرو نوبت
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Process */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block text-xs font-semibold tracking-[0.1em] uppercase text-[var(--color-accent)] mb-4 font-sans">نحوه رزرو</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">چهار مرحله تا زیبایی</h2>
+            <p className="text-[var(--color-muted)] max-w-xl mx-auto">فرآیند رزرو در FM Beauty ساده و سریع طراحی شده است.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {processSteps.map((step, i) => (
+              <div key={i} className="glass-card p-6 text-center relative overflow-hidden">
+                <div className="absolute top-4 right-4 text-5xl font-display font-bold text-[var(--color-accent)]/10 leading-none">
+                  {step.num}
+                </div>
+                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center text-[var(--color-accent)] font-bold text-lg">
+                  {step.num}
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+                <p className="text-sm text-[var(--color-muted)]">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gallery */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block text-xs font-semibold tracking-[0.1em] uppercase text-[var(--color-accent)] mb-4 font-sans">نمونه کارها</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">گالری تصاویر</h2>
+            <p className="text-[var(--color-muted)] max-w-xl mx-auto">برخی از نمونه کارهای انجام شده در FM Beauty</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {galleryImages.map((img, i) => (
+              <div key={i} className="relative aspect-square rounded-2xl overflow-hidden group glass-card-borderless">
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                  <span className="text-[var(--color-fg)] text-sm font-medium">{img.alt}</span>
                 </div>
               </div>
             ))}

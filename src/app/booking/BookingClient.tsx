@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Service {
   id: string;
@@ -21,6 +20,26 @@ interface TimeSlot {
   label: string;
 }
 
+const FIXED_SLOTS: TimeSlot[] = [
+  { start: "09:00", end: "10:30", label: "۰۹:۰۰ - ۱۰:۳۰" },
+  { start: "10:30", end: "12:00", label: "۱۰:۳۰ - ۱۲:۰۰" },
+  { start: "12:00", end: "13:30", label: "۱۲:۰۰ - ۱۳:۳۰" },
+  { start: "13:30", end: "15:00", label: "۱۳:۳۰ - ۱۵:۰۰" },
+  { start: "15:00", end: "16:30", label: "۱۵:۰۰ - ۱۶:۳۰" },
+  { start: "16:30", end: "18:00", label: "۱۶:۳۰ - ۱۸:۰۰" },
+  { start: "18:00", end: "19:30", label: "۱۸:۰۰ - ۱۹:۳۰" },
+  { start: "19:30", end: "21:00", label: "۱۹:۳۰ - ۲۱:۰۰" },
+];
+
+const STATIC_SERVICES: Service[] = [
+  { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, duration: 90, image: "/images/gallery/valyum.jpg" },
+  { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, duration: 90, image: "/images/gallery/spayki.jpg" },
+  { id: "natural", name: "اکستنشن مژه نچرال", description: "مژه‌های طبیعی و ظریف برای روزمره", price: 1100000, duration: 90, image: "/images/services/nacral.jpg" },
+  { id: "repair", name: "ترمیم مژه", description: "ترمیم مژه‌های قبلی (نیاز به هماهنگی)", price: 1500000, duration: 90, image: "/images/gallery/nemune-1.jpg" },
+  { id: "lash-lift", name: "لیفت مژه و لمینیت", description: "فر طبیعی و ماندگار مژه‌ها بدون اکستنشن", price: 1200000, duration: 90, image: "/images/services/lift-moje.jpg" },
+  { id: "brow-lift", name: "لیفت ابرو", description: "مرتب‌سازی و فرم‌دهی ابروها", price: 1200000, duration: 90, image: "/images/services/lift-abru.jpg" },
+];
+
 function StepIndicator({ currentStep }: { currentStep: number }) {
   const steps = [
     { num: 1, label: "انتخاب خدمت" },
@@ -31,45 +50,45 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
   const MotionDiv = motion.div as any;
 
   return (
-    <div className="flex items-center justify-center gap-0 mb-10">
-      {steps.map((step, i) => (
-        <div key={step.num} className="flex items-center">
-          <MotionDiv
-            className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
-              step.num === currentStep
-                ? "bg-gradient-to-br from-accent-500 to-accent-400 shadow-lg shadow-accent-500/30 scale-110"
-                : step.num < currentStep
-                ? "bg-accent-500/20 text-accent-400"
-                : "bg-primary-700/40 text-text-muted"
-            }`}
-            animate={{
-              scale: step.num === currentStep ? [1, 1.1, 1] : 1,
-            }}
-            transition={{ duration: 0.5 }}
-          >
-            {step.num < currentStep ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            ) : (
-              step.num
+    <div className="flex flex-col items-center mb-10">
+      <div className="flex items-center justify-center gap-0">
+        {steps.map((step, i) => (
+          <div key={step.num} className="flex items-center">
+            <MotionDiv
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
+                step.num === currentStep
+                  ? "bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-2)] shadow-lg shadow-[var(--color-accent)]/30 scale-110 text-[var(--color-bg)]"
+                  : step.num < currentStep
+                  ? "bg-[var(--color-accent)]/20 text-[var(--color-accent)]"
+                  : "bg-[var(--color-card-solid)]/40 text-[var(--color-muted)]"
+              }`}
+              animate={{ scale: step.num === currentStep ? [1, 1.1, 1] : 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {step.num < currentStep ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              ) : (
+                step.num
+              )}
+            </MotionDiv>
+            {i < steps.length - 1 && (
+              <div className="w-16 h-0.5 mx-2 rounded-full bg-[var(--color-card-solid)]/40 overflow-hidden">
+                <MotionDiv
+                  className="h-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-2)]"
+                  initial={{ width: "0%" }}
+                  animate={{ width: step.num <= currentStep ? "100%" : "0%" }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                />
+              </div>
             )}
-          </MotionDiv>
-          {i < steps.length - 1 && (
-            <div className="w-16 h-0.5 mx-2 rounded-full bg-primary-700/40 overflow-hidden">
-              <MotionDiv
-                className="h-full bg-gradient-to-r from-accent-500 to-accent-400"
-                initial={{ width: "0%" }}
-                animate={{ width: step.num <= currentStep ? "100%" : "0%" }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-              />
-            </div>
-          )}
-        </div>
-      ))}
-      <div className="flex justify-center gap-2 sm:gap-8 mt-2 text-[10px] sm:text-xs text-text-muted">
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-center gap-2 sm:gap-8 mt-3 text-[10px] sm:text-xs text-[var(--color-muted)]">
         {steps.map((step) => (
-          <span key={step.num} className={`${step.num === currentStep ? "text-accent-500 font-medium" : ""} hidden sm:block`}>
+          <span key={step.num} className={`${step.num === currentStep ? "text-[var(--color-accent)] font-medium" : ""} hidden sm:block`}>
             {step.label}
           </span>
         ))}
@@ -84,24 +103,15 @@ const stepVariants = {
   exit: { opacity: 0, x: -40 },
 };
 
-async function fetchJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || `خطا در برقراری ارتباط (${res.status})`);
-  }
-  return res.json();
-}
-
 export default function BookingClient() {
   const { data: session } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const preselectedService = searchParams.get("service") || "";
 
   const [step, setStep] = useState(1);
-  const [services, setServices] = useState<Service[]>([]);
-  const [servicesLoading, setServicesLoading] = useState(true);
-  const [servicesError, setServicesError] = useState("");
-  const [selectedService, setSelectedService] = useState<string>("");
+  const [services, setServices] = useState<Service[]>(STATIC_SERVICES);
+  const [selectedService, setSelectedService] = useState<string>(preselectedService);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [slotsLoading, setSlotsLoading] = useState(false);
@@ -112,15 +122,16 @@ export default function BookingClient() {
   const [message, setMessage] = useState("");
 
   const loadServices = useCallback(async () => {
-    setServicesLoading(true);
-    setServicesError("");
     try {
-      const data = await fetchJson<Service[]>("/api/services");
-      setServices(data);
-    } catch (e: any) {
-      setServicesError(e.message || "خطا در دریافت لیست خدمات");
-    } finally {
-      setServicesLoading(false);
+      const res = await fetch("/api/services");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setServices(data);
+        }
+      }
+    } catch {
+      // Keep STATIC_SERVICES
     }
   }, []);
 
@@ -138,31 +149,21 @@ export default function BookingClient() {
     setSlotsError("");
     fetch(`/api/bookings/available-slots?date=${selectedDate}`)
       .then(async (r) => {
-        if (!r.ok) throw new Error("خطا در دریافت ساعات خالی");
-        return r.json();
+        if (!r.ok) return FIXED_SLOTS;
+        const data = await r.json();
+        return Array.isArray(data) ? data : FIXED_SLOTS;
       })
       .then((data: TimeSlot[]) => {
         if (!cancelled) setAvailableSlots(data);
       })
-      .catch((e) => {
-        if (!cancelled) setSlotsError(e.message || "خطا در دریافت ساعات خالی");
+      .catch(() => {
+        if (!cancelled) setAvailableSlots(FIXED_SLOTS);
       })
       .finally(() => {
         if (!cancelled) setSlotsLoading(false);
       });
     return () => { cancelled = true; };
   }, [selectedDate]);
-
-  function generateDailySlots(): TimeSlot[] {
-    const slots: TimeSlot[] = [];
-    for (let h = 9; h < 20; h++) {
-      const start = `${h.toString().padStart(2, "0")}:00`;
-      const endH = h + 1;
-      const end = `${endH.toString().padStart(2, "0")}:30`;
-      slots.push({ start, end, label: `${start} - ${end}` });
-    }
-    return slots;
-  }
 
   const today = new Date().toISOString().split("T")[0];
   const selectedServiceData = services.find((s) => s.id === selectedService);
@@ -213,11 +214,11 @@ export default function BookingClient() {
   const MotionButton = motion.button as any;
 
   return (
-    <div className="min-h-screen px-4 py-8">
+    <div className="min-h-screen px-4 py-8 pt-24">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-text-primary mb-2">رزرو نوبت</h1>
-          <p className="text-text-muted">تاریخ و ساعت مورد نظر خود را انتخاب کنید</p>
+          <h1 className="text-3xl font-bold text-[var(--color-fg)] mb-2">رزرو نوبت</h1>
+          <p className="text-[var(--color-muted)]">تاریخ و ساعت مورد نظر خود را انتخاب کنید</p>
         </div>
 
         <StepIndicator currentStep={step} />
@@ -235,42 +236,27 @@ export default function BookingClient() {
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   className="glass-card p-6"
                 >
-                  <h2 className="text-lg font-semibold text-text-primary mb-4">انتخاب خدمت</h2>
-                  {servicesLoading ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="p-4 rounded-xl bg-primary-700/30 animate-shimmer h-24" />
-                      ))}
-                    </div>
-                  ) : servicesError ? (
-                    <div className="text-center py-8">
-                      <p className="text-danger mb-3">{servicesError}</p>
-                      <button onClick={loadServices} className="btn-primary text-sm py-2 px-6">
-                        تلاش مجدد
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {services.map((service) => (
-                        <MotionButton
-                          key={service.id}
-                          onClick={() => setSelectedService(service.id)}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                          className={`p-4 rounded-xl text-right transition-all ${
-                            selectedService === service.id ? "slot-selected" : "slot-available"
-                          }`}
-                        >
-                          <div className="font-medium">{service.name}</div>
-                          <div className="text-xs opacity-70 mt-1">{service.description}</div>
-                          <div className="text-sm font-bold mt-2 text-accent-500">
-                            {service.price.toLocaleString("fa-IR")} تومان
-                          </div>
-                        </MotionButton>
-                      ))}
-                    </div>
-                  )}
+                  <h2 className="text-lg font-semibold text-[var(--color-fg)] mb-4">انتخاب خدمت</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {services.map((service) => (
+                      <MotionButton
+                        key={service.id}
+                        onClick={() => setSelectedService(service.id)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                        className={`p-4 rounded-xl text-right transition-all cursor-pointer ${
+                          selectedService === service.id ? "slot-selected" : "slot-available"
+                        }`}
+                      >
+                        <div className="font-medium">{service.name}</div>
+                        <div className="text-xs opacity-70 mt-1">{service.description}</div>
+                        <div className="text-sm font-bold mt-2 text-[var(--color-accent)]">
+                          {service.price.toLocaleString("fa-IR")} تومان
+                        </div>
+                      </MotionButton>
+                    ))}
+                  </div>
                 </MotionDiv>
               )}
 
@@ -284,7 +270,7 @@ export default function BookingClient() {
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   className="glass-card p-6"
                 >
-                  <h2 className="text-lg font-semibold text-text-primary mb-4">انتخاب تاریخ و ساعت</h2>
+                  <h2 className="text-lg font-semibold text-[var(--color-fg)] mb-4">انتخاب تاریخ و ساعت</h2>
                   <input
                     type="date"
                     value={selectedDate}
@@ -297,22 +283,12 @@ export default function BookingClient() {
                       {slotsLoading ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                            <div key={i} className="p-4 rounded-xl bg-primary-700/30 animate-shimmer h-12" />
+                            <div key={i} className="p-4 rounded-xl bg-[var(--color-card-solid)]/30 animate-shimmer h-12" />
                           ))}
-                        </div>
-                      ) : slotsError ? (
-                        <div className="text-center py-6">
-                          <p className="text-danger mb-3">{slotsError}</p>
-                          <button
-                            onClick={() => setSelectedDate(selectedDate)}
-                            className="btn-primary text-sm py-2 px-6"
-                          >
-                            تلاش مجدد
-                          </button>
                         </div>
                       ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                          {generateDailySlots().map((slot) => {
+                          {FIXED_SLOTS.map((slot) => {
                             const isBooked = availableSlots.length > 0 && !availableSlots.find((s) => s.start === slot.start);
                             return (
                               <MotionButton
@@ -350,7 +326,7 @@ export default function BookingClient() {
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   className="glass-card p-6"
                 >
-                  <h2 className="text-lg font-semibold text-text-primary mb-4">توضیحات تکمیلی (اختیاری)</h2>
+                  <h2 className="text-lg font-semibold text-[var(--color-fg)] mb-4">توضیحات تکمیلی (اختیاری)</h2>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
@@ -368,7 +344,7 @@ export default function BookingClient() {
                   onClick={() => setStep(step - 1)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-outline text-sm py-2.5 px-6"
+                  className="btn-ghost text-sm py-2.5 px-6 cursor-pointer"
                 >
                   مرحله قبل
                 </MotionButton>
@@ -385,7 +361,7 @@ export default function BookingClient() {
                   }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-primary text-sm py-2.5 px-6"
+                  className="btn-primary text-sm py-2.5 px-6 cursor-pointer"
                 >
                   مرحله بعد
                 </MotionButton>
@@ -395,33 +371,33 @@ export default function BookingClient() {
 
           <div className="lg:col-span-1">
             <div className="glass-card p-6 lg:sticky top-24">
-              <h2 className="text-lg font-semibold text-text-primary mb-4">خلاصه رزرو</h2>
+              <h2 className="text-lg font-semibold text-[var(--color-fg)] mb-4">خلاصه رزرو</h2>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-text-muted">خدمت:</span>
-                  <span className="text-text-primary">{selectedServiceData?.name || "—"}</span>
+                  <span className="text-[var(--color-muted)]">خدمت:</span>
+                  <span className="text-[var(--color-fg)]">{selectedServiceData?.name || "—"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-text-muted">تاریخ:</span>
-                  <span className="text-text-primary">{selectedDate || "—"}</span>
+                  <span className="text-[var(--color-muted)]">تاریخ:</span>
+                  <span className="text-[var(--color-fg)]">{selectedDate || "—"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-text-muted">ساعت:</span>
-                  <span className="text-text-primary">{selectedSlot || "—"}</span>
+                  <span className="text-[var(--color-muted)]">ساعت:</span>
+                  <span className="text-[var(--color-fg)]">{selectedSlot || "—"}</span>
                 </div>
-                <hr className="border-accent-500/10" />
+                <hr className="border-[var(--color-accent)]/10" />
                 <div className="flex justify-between">
-                  <span className="text-text-muted">قیمت:</span>
-                  <span className="text-text-primary">{selectedServiceData?.price.toLocaleString("fa-IR")} تومان</span>
+                  <span className="text-[var(--color-muted)]">قیمت:</span>
+                  <span className="text-[var(--color-fg)]">{selectedServiceData?.price.toLocaleString("fa-IR")} تومان</span>
                 </div>
-                <div className="flex justify-between text-accent-500 font-bold">
+                <div className="flex justify-between text-[var(--color-accent)] font-bold">
                   <span>پیش‌پرداخت (۳۰٪):</span>
                   <span>{depositAmount.toLocaleString("fa-IR")} تومان</span>
                 </div>
               </div>
 
               {message && (
-                <p className="text-sm mt-3 text-danger text-center animate-shake">{message}</p>
+                <p className="text-sm mt-3 text-[var(--color-danger)] text-center animate-shake">{message}</p>
               )}
 
               {step === 3 && (
@@ -430,14 +406,14 @@ export default function BookingClient() {
                   disabled={bookingLoading || !selectedService || !selectedDate || !selectedSlot}
                   whileHover={!(bookingLoading || !selectedService || !selectedDate || !selectedSlot) ? { scale: 1.02 } : undefined}
                   whileTap={!(bookingLoading || !selectedService || !selectedDate || !selectedSlot) ? { scale: 0.98 } : undefined}
-                  className="btn-primary w-full mt-5"
+                  className="btn-primary w-full mt-5 cursor-pointer"
                 >
                   {bookingLoading ? "در حال ثبت..." : session ? "ادامه و پرداخت" : "ورود برای رزرو"}
                 </MotionButton>
               )}
 
               {!session && (
-                <p className="text-xs text-text-muted text-center mt-3">
+                <p className="text-xs text-[var(--color-muted)] text-center mt-3">
                   برای رزرو نیاز به ورود یا ثبت‌نام دارید
                 </p>
               )}

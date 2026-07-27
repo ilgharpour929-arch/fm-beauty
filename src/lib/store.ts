@@ -112,6 +112,14 @@ export const memoryStore = {
       b.status = status;
     }
   },
+  updateBookingReceipt: (id: string, receiptImage: string) => {
+    if (!globalStore.__bookingsStore) return;
+    const b = globalStore.__bookingsStore.find((item) => item.id === id);
+    if (b) {
+      b.receiptImage = receiptImage;
+      b.status = "WAITING_APPROVAL";
+    }
+  },
   isSlotBooked: (date: string, startTime: string) => {
     // Check if whole date is blocked
     if (memoryStore.isDateBlocked(date)) return true;

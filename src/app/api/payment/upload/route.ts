@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
@@ -20,21 +21,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "فیش و شناسه رزرو الزامی است" }, { status: 400 });
     }
 
-    let fileName = `receipt-${Date.now()}.jpg`;
+    let receiptImage = "";
     try {
-      const ext = receipt.name.split(".").pop() || "jpg";
-      fileName = `receipt-${uuidv4()}.${ext}`;
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
-      await mkdir(uploadDir, { recursive: true }).catch(() => {});
       const buffer = Buffer.from(await receipt.arrayBuffer());
-      await writeFile(path.join(uploadDir, fileName), buffer).catch(() => {});
+      const base64 = buffer.toString("base64");
+      const mimeType = receipt.type || "image/jpeg";
+      receiptImage = `data:${mimeType};base64,${base64}`;
     } catch {}
+
+    // Update memoryStore booking for instant admin visibility
+    if (receiptImage) {
+      memoryStore.updateBookingReceipt(bookingId, receiptImage);
+    } else {
+      memoryStore.updateBookingStatus(bookingId, "WAITING_APPROVAL");
+    }
 
     try {
       await prisma.booking.update({
         where: { id: bookingId },
         data: {
-          receiptImage: `/uploads/${fileName}`,
+          receiptImage: receiptImage || `/uploads/receipt-${Date.now()}.jpg`,
           status: "WAITING_APPROVAL",
         },
       });

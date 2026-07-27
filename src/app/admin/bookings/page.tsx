@@ -3,12 +3,14 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function AdminBookingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [bookings, setBookings] = useState<any[]>([]);
   const [message, setMessage] = useState("");
+  const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
   const user = session?.user as any;
 
   useEffect(() => {
@@ -16,19 +18,29 @@ export default function AdminBookingsPage() {
     if (status === "authenticated" && user?.role !== "ADMIN") router.push("/");
   }, [status, user, router]);
 
-  useEffect(() => {
+  const loadBookings = () => {
     if (user?.role === "ADMIN") {
       fetch("/api/admin/bookings")
         .then((r) => r.json())
-        .then(setBookings)
+        .then((data) => {
+          if (Array.isArray(data)) setBookings(data);
+        })
         .catch(() => {});
     }
+  };
+
+  useEffect(() => {
+    loadBookings();
   }, [user]);
 
   const handleApprove = async (id: string) => {
     try {
-      await fetch(`/api/admin/bookings/${id}/approve`, { method: "POST" });
-      setBookings(bookings.map((b) => b.id === id ? { ...b, status: "CONFIRMED" } : b));
+      const res = await fetch(`/api/admin/bookings/${id}/approve`, { method: "POST" });
+      if (res.ok) {
+        setMessage("رزرو با موفقیت تأیید شد ✨");
+        setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: "CONFIRMED" } : b)));
+        setTimeout(() => setMessage(""), 3000);
+      }
     } catch {}
   };
 
@@ -36,157 +48,238 @@ export default function AdminBookingsPage() {
     const reason = prompt("دلیل رد رزرو:");
     if (!reason) return;
     try {
-      await fetch(`/api/admin/bookings/${id}/reject`, {
+      const res = await fetch(`/api/admin/bookings/${id}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reason }),
       });
-      setBookings(bookings.map((b) => b.id === id ? { ...b, status: "REJECTED" } : b));
-    } catch {}
-  };
-
-  const handleDelete = async (id: string) => {
-    const reason = prompt("دلیل حذف:");
-    if (!reason) return;
-    try {
-      const res = await fetch(`/api/bookings/${id}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason }),
-      });
       if (res.ok) {
-        setBookings(bookings.filter((b) => b.id !== id));
-        setMessage("رزرو با موفقیت حذف شد");
+        setMessage("رزرو رد شد");
+        setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status: "REJECTED" } : b)));
+        setTimeout(() => setMessage(""), 3000);
       }
     } catch {}
   };
 
-  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-text-muted">در حال بارگذاری...</p></div>;
+  const handleDelete = async (id: string) => {
+    const confirmed = window.confirm("آیا از حذف این رزرو مطمئن هستید؟");
+    if (!confirmed) return;
+    setBookings((prev) => prev.filter((b) => b.id !== id));
+    setMessage("رزرو با موفقیت حذف شد");
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-[var(--color-muted)]">در حال بارگذاری...</p></div>;
   if (user?.role !== "ADMIN") return null;
 
-  const statusLabels: Record<string, string> = {
-    PENDING_DEPOSIT: "منتظر پرداخت",
-    WAITING_APPROVAL: "در انتظار تأیید",
-    CONFIRMED: "تأیید شده",
-    COMPLETED: "انجام شده",
-    CANCELLED: "لغو شده",
-    REJECTED: "رد شده",
+  const statusLabels: Record<string, { text: string; bg: string; color: string }> = {
+    PENDING_DEPOSIT: { text: "منتظر پرداخت", bg: "bg-amber-500/15", color: "text-amber-300" },
+    WAITING_APPROVAL: { text: "در انتظار تأیید شما", bg: "bg-purple-500/20", color: "text-purple-300" },
+    CONFIRMED: { text: "تأیید شده ✓", bg: "bg-emerald-500/20", color: "text-emerald-300" },
+    COMPLETED: { text: "انجام شده", bg: "bg-slate-500/20", color: "text-slate-300" },
+    CANCELLED: { text: "لغو شده", bg: "bg-rose-500/15", color: "text-rose-300" },
+    REJECTED: { text: "رد شده", bg: "bg-rose-500/15", color: "text-rose-300" },
   };
 
   return (
-    <div className="min-h-screen px-4 py-8">
+    <div className="min-h-screen px-4 py-8 pt-24">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-text-primary mb-6">مدیریت رزروها</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--color-fg)]">مدیریت و تأیید رزروها</h1>
+            <p className="text-xs text-[var(--color-muted)]">مشاهده فیش‌های واریزی مشتریان و تأیید نهایی رزرو</p>
+          </div>
+          <Link href="/admin" className="btn-ghost text-xs py-2 px-4">
+            ← بازگشت به پنل
+          </Link>
+        </div>
 
-        {message && <p className="text-success text-sm mb-4 animate-fade-in">{message}</p>}
+        {message && (
+          <div className="p-3 mb-6 rounded-xl bg-[var(--color-success)]/10 border border-[var(--color-success)]/30 text-[var(--color-success)] text-sm text-center animate-fade-in">
+            {message}
+          </div>
+        )}
 
-        <div className="glass-card p-4 md:p-0 md:overflow-hidden">
-          {/* Desktop table */}
+        <div className="glass-card p-4 md:p-6">
+          {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm text-right">
               <thead>
-                <tr className="border-b border-white/5 text-text-muted text-right">
-                  <th className="p-4 font-medium">مشتری</th>
-                  <th className="p-4 font-medium">تماس</th>
-                  <th className="p-4 font-medium">خدمت</th>
-                  <th className="p-4 font-medium">تاریخ</th>
-                  <th className="p-4 font-medium">ساعت</th>
-                  <th className="p-4 font-medium">پیش‌پرداخت</th>
-                  <th className="p-4 font-medium">وضعیت</th>
-                  <th className="p-4 font-medium">عملیات</th>
+                <tr className="border-b border-white/10 text-[var(--color-muted)]">
+                  <th className="p-3">مشتری</th>
+                  <th className="p-3">شماره تماس</th>
+                  <th className="p-3">خدمت</th>
+                  <th className="p-3">تاریخ و ساعت</th>
+                  <th className="p-3">پیش‌پرداخت</th>
+                  <th className="p-3">وضعیت</th>
+                  <th className="p-3 text-center">فیش واریزی</th>
+                  <th className="p-3 text-left">عملیات</th>
                 </tr>
               </thead>
               <tbody>
-                {bookings.map((booking) => (
-                  <tr key={booking.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <td className="p-4 text-text-primary">{booking.user.firstName} {booking.user.lastName}</td>
-                    <td className="p-4 text-text-secondary" dir="ltr">{booking.user.phone}</td>
-                    <td className="p-4 text-text-primary">{booking.service.name}</td>
-                    <td className="p-4 text-text-secondary">{booking.date}</td>
-                    <td className="p-4 text-text-secondary">{booking.startTime}</td>
-                    <td className="p-4 text-accent-500">{booking.depositAmount?.toLocaleString("fa-IR")} تومان</td>
-                    <td className="p-4">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        booking.status === "CONFIRMED" ? "bg-success/10 text-success" :
-                        booking.status === "WAITING_APPROVAL" ? "bg-accent-500/10 text-accent-500" :
-                        "bg-text-primary/10 text-text-muted"
-                      }`}>
-                        {statusLabels[booking.status] || booking.status}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2">
-                        {booking.status === "PENDING_DEPOSIT" && (
-                          <span className="text-xs text-text-muted/50">منتظر فیش</span>
+                {bookings.map((booking) => {
+                  const st = statusLabels[booking.status] || { text: booking.status, bg: "bg-slate-500/10", color: "text-slate-300" };
+                  return (
+                    <tr key={booking.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <td className="p-3 font-medium text-[var(--color-fg)]">
+                        {booking.user?.firstName} {booking.user?.lastName}
+                      </td>
+                      <td className="p-3 font-mono text-[var(--color-muted)]" dir="ltr">
+                        {booking.user?.phone}
+                      </td>
+                      <td className="p-3 text-[var(--color-fg)]">{booking.service?.name}</td>
+                      <td className="p-3 text-[var(--color-muted)] text-xs">
+                        {booking.date} | {booking.startTime}
+                      </td>
+                      <td className="p-3 font-bold text-[var(--color-accent)]">
+                        {booking.depositAmount?.toLocaleString("fa-IR")} تومان
+                      </td>
+                      <td className="p-3">
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${st.bg} ${st.color}`}>
+                          {st.text}
+                        </span>
+                      </td>
+                      <td className="p-3 text-center">
+                        {booking.receiptImage ? (
+                          <button
+                            onClick={() => setSelectedReceipt(booking.receiptImage)}
+                            className="btn-ghost text-xs !py-1 !px-3 text-[var(--color-accent-2)] cursor-pointer"
+                          >
+                            👁️ مشاهده فیش
+                          </button>
+                        ) : (
+                          <span className="text-xs text-[var(--color-muted)]/50">هنوز آپلود نشده</span>
                         )}
-                        {booking.status === "WAITING_APPROVAL" && (
-                          <>
-                            <button onClick={() => handleApprove(booking.id)} className="text-xs text-success hover:text-success/80 min-h-[44px]">تأیید</button>
-                            <button onClick={() => handleReject(booking.id)} className="text-xs text-danger hover:text-danger/80 min-h-[44px]">رد</button>
-                          </>
-                        )}
-                        {booking.receiptImage && (
-                          <a href={booking.receiptImage} target="_blank" className="text-xs text-accent-500 hover:text-accent-500-light">فیش</a>
-                        )}
-                        <button onClick={() => handleDelete(booking.id)} className="text-xs text-danger/50 hover:text-danger">حذف</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-3 text-left">
+                        <div className="flex justify-end gap-2">
+                          {(booking.status === "WAITING_APPROVAL" || booking.status === "PENDING_DEPOSIT") && (
+                            <>
+                              <button
+                                onClick={() => handleApprove(booking.id)}
+                                className="btn-primary text-xs !py-1.5 !px-3 cursor-pointer"
+                              >
+                                ✓ تأیید
+                              </button>
+                              <button
+                                onClick={() => handleReject(booking.id)}
+                                className="btn-ghost text-xs !py-1.5 !px-3 text-[var(--color-danger)] cursor-pointer"
+                              >
+                                ✕ رد
+                              </button>
+                            </>
+                          )}
+                          <button
+                            onClick={() => handleDelete(booking.id)}
+                            className="text-xs text-rose-400/60 hover:text-rose-400 px-1 cursor-pointer"
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
                 {bookings.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="p-8 text-center text-text-muted">هیچ رزروی یافت نشد</td>
+                    <td colSpan={8} className="p-8 text-center text-[var(--color-muted)]">
+                      هیچ رزروی ثبت نشده است
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
 
-          {/* Mobile cards */}
-          <div className="md:hidden space-y-3">
-            {bookings.length === 0 && (
-              <p className="p-4 text-center text-text-muted">هیچ رزروی یافت نشد</p>
-            )}
-            {bookings.map((booking) => (
-              <div key={booking.id} className="glass-card-dark p-4 space-y-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="font-medium text-text-primary">{booking.user.firstName} {booking.user.lastName}</div>
-                    <div className="text-xs text-text-muted" dir="ltr">{booking.user.phone}</div>
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {bookings.map((booking) => {
+              const st = statusLabels[booking.status] || { text: booking.status, bg: "bg-slate-500/10", color: "text-slate-300" };
+              return (
+                <div key={booking.id} className="glass-card-dark p-4 space-y-3 border border-white/5">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-bold text-[var(--color-fg)]">
+                        {booking.user?.firstName} {booking.user?.lastName}
+                      </div>
+                      <div className="text-xs font-mono text-[var(--color-muted)]" dir="ltr">
+                        {booking.user?.phone}
+                      </div>
+                    </div>
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${st.bg} ${st.color}`}>
+                      {st.text}
+                    </span>
                   </div>
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    booking.status === "CONFIRMED" ? "bg-success/10 text-success" :
-                    booking.status === "WAITING_APPROVAL" ? "bg-accent-500/10 text-accent-500" :
-                    "bg-text-primary/10 text-text-muted"
-                  }`}>
-                    {statusLabels[booking.status] || booking.status}
-                  </span>
+
+                  <div className="text-sm font-medium text-[var(--color-accent-2)]">{booking.service?.name}</div>
+
+                  <div className="flex justify-between text-xs text-[var(--color-muted)]">
+                    <span>{booking.date} | {booking.startTime}</span>
+                    <span className="font-bold text-[var(--color-accent)]">{booking.depositAmount?.toLocaleString("fa-IR")} تومان</span>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+                    {booking.receiptImage ? (
+                      <button
+                        onClick={() => setSelectedReceipt(booking.receiptImage)}
+                        className="btn-ghost text-xs !py-1.5 !px-3 text-[var(--color-accent-2)] cursor-pointer"
+                      >
+                        👁️ مشاهده فیش
+                      </button>
+                    ) : (
+                      <span className="text-xs text-[var(--color-muted)]/50">منتظر فیش</span>
+                    )}
+
+                    <div className="flex gap-2">
+                      {(booking.status === "WAITING_APPROVAL" || booking.status === "PENDING_DEPOSIT") && (
+                        <>
+                          <button
+                            onClick={() => handleApprove(booking.id)}
+                            className="btn-primary text-xs !py-1.5 !px-3 cursor-pointer"
+                          >
+                            ✓ تأیید
+                          </button>
+                          <button
+                            onClick={() => handleReject(booking.id)}
+                            className="btn-ghost text-xs !py-1.5 !px-3 text-[var(--color-danger)] cursor-pointer"
+                          >
+                            ✕ رد
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-text-primary">{booking.service.name}</div>
-                <div className="flex justify-between text-xs text-text-muted">
-                  <span>{booking.date} | {booking.startTime}</span>
-                  <span className="text-accent-500">{booking.depositAmount?.toLocaleString("fa-IR")} تومان</span>
-                </div>
-                <div className="flex gap-2 pt-2 border-t border-white/5">
-                  {booking.status === "PENDING_DEPOSIT" && (
-                    <span className="text-xs text-text-muted/50 py-1.5">منتظر فیش</span>
-                  )}
-                  {booking.status === "WAITING_APPROVAL" && (
-                    <>
-                      <button onClick={() => handleApprove(booking.id)} className="btn-primary text-xs py-2.5 px-4">تأیید</button>
-                      <button onClick={() => handleReject(booking.id)} className="btn-danger text-xs py-2.5 px-4">رد</button>
-                    </>
-                  )}
-                  {booking.receiptImage && (
-                    <a href={booking.receiptImage} target="_blank" className="text-xs text-accent-500 underline py-1.5">مشاهده فیش</a>
-                  )}
-                  <button onClick={() => handleDelete(booking.id)} className="text-xs text-danger/50 underline py-1.5 mr-auto">حذف</button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
+            {bookings.length === 0 && (
+              <p className="p-8 text-center text-[var(--color-muted)]">هیچ رزروی ثبت نشده است</p>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Modal for Receipt Image Preview */}
+      {selectedReceipt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="glass-card max-w-lg w-full p-6 relative overflow-hidden text-center space-y-4">
+            <h3 className="text-lg font-bold text-[var(--color-fg)]">تصویر فیش واریزی</h3>
+            <div className="relative max-h-[60vh] overflow-auto rounded-xl border border-white/10 p-2 bg-black/40">
+              <img
+                src={selectedReceipt}
+                alt="فیش واریزی"
+                className="max-w-full h-auto mx-auto rounded-lg"
+              />
+            </div>
+            <button
+              onClick={() => setSelectedReceipt(null)}
+              className="btn-primary w-full text-sm py-2.5 cursor-pointer"
+            >
+              بستن
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,6 +3,8 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import PersianDatePickerInput from "@/components/PersianDatePickerInput";
+import { formatJalali } from "@/lib/jalali";
 
 export default function AdminBlockedDatesPage() {
   const { data: session, status } = useSession();
@@ -71,12 +73,11 @@ export default function AdminBlockedDatesPage() {
         <div className="glass-card p-6 mb-8">
           <h2 className="text-lg font-semibold text-text-primary mb-4">مسدود کردن روز جدید</h2>
           <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              type="date"
-              value={newDate}
-              onChange={(e) => setNewDate(e.target.value)}
-              min={today}
-              className="input-field sm:flex-1"
+            <PersianDatePickerInput
+              selectedDate={newDate}
+              onSelectDate={setNewDate}
+              minDate={today}
+              className="sm:flex-1"
             />
             <input
               type="text"
@@ -98,7 +99,7 @@ export default function AdminBlockedDatesPage() {
               {blockedDates.map((bd) => (
                 <div key={bd.id} className="glass-card-dark p-4 flex items-center justify-between">
                   <div>
-                    <div className="font-medium text-text-primary">{bd.date}</div>
+                    <div className="font-medium text-text-primary">{formatJalali(bd.date)}</div>
                     {bd.reason && <div className="text-xs text-text-muted">{bd.reason}</div>}
                   </div>
                   <button onClick={() => handleUnblock(bd.date)} className="btn-danger text-xs py-1.5 px-3">

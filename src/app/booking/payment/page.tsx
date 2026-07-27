@@ -37,6 +37,39 @@ function PaymentForm() {
       .catch((e) => setFetchError(e.message));
   }, [bookingId, session]);
 
+  async function compressImage(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1000;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", 0.75));
+        };
+        img.onerror = () => resolve(reader.result as string); // fallback to uncompressed if canvas fails
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error("خطا در خواندن فایل تصویر"));
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault();
     if (!file || !bookingId) {
@@ -47,37 +80,29 @@ function PaymentForm() {
     setLoading(true);
     setMessage("");
 
-    // Convert file to Base64 on client-side for 100% fail-safe delivery
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64Data = reader.result as string;
+    try {
+      // Compress mobile camera photos to ~75KB Base64 so they never fail on Vercel
+      const base64Data = await compressImage(file);
 
-      try {
-        const res = await fetch("/api/payment/upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            bookingId,
-            receiptImage: base64Data,
-          }),
-        });
+      const res = await fetch("/api/payment/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId,
+          receiptImage: base64Data,
+        }),
+      });
 
-        if (res.ok) {
-          router.push(`/dashboard/bookings`);
-        } else {
-          setMessage("خطا در ثبت فیش");
-          setLoading(false);
-        }
-      } catch {
-        setMessage("خطا در ارتباط با سرور");
+      if (res.ok) {
+        router.push(`/dashboard/bookings`);
+      } else {
+        setMessage("خطا در ثبت فیش");
         setLoading(false);
       }
-    };
-    reader.onerror = () => {
-      setMessage("خطا در خواندن فایل تصویر");
+    } catch {
+      setMessage("خطا در ارتباط با سرور یا پردازش تصویر");
       setLoading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   }
 
   const [bankInfo, setBankInfo] = useState({
@@ -87,17 +112,41 @@ function PaymentForm() {
   });
 
   useEffect(() => {
-    const savedCard = localStorage.getItem("bank_cardNumber");
-    const savedHolder = localStorage.getItem("bank_accountHolder");
-    const savedBank = localStorage.getItem("bank_name");
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data && data.cardNumber) {
+          setBankInfo({
+            cardNumber: data.cardNumber || "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
+            accountHolder: data.accountHolder || "فاطمه محمدی",
+            bank: data.bank || "بانک ملی",
+          });
+        } else {
+          const savedCard = localStorage.getItem("bank_cardNumber");
+          const savedHolder = localStorage.getItem("bank_accountHolder");
+          const savedBank = localStorage.getItem("bank_name");
+          if (savedCard || savedHolder || savedBank) {
+            setBankInfo({
+              cardNumber: savedCard || "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
+              accountHolder: savedHolder || "فاطمه محمدی",
+              bank: savedBank || "بانک ملی",
+            });
+          }
+        }
+      })
+      .catch(() => {
+        const savedCard = localStorage.getItem("bank_cardNumber");
+        const savedHolder = localStorage.getItem("bank_accountHolder");
+        const savedBank = localStorage.getItem("bank_name");
 
-    if (savedCard || savedHolder || savedBank) {
-      setBankInfo({
-        cardNumber: savedCard || "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
-        accountHolder: savedHolder || "فاطمه محمدی",
-        bank: savedBank || "بانک ملی",
+        if (savedCard || savedHolder || savedBank) {
+          setBankInfo({
+            cardNumber: savedCard || "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
+            accountHolder: savedHolder || "فاطمه محمدی",
+            bank: savedBank || "بانک ملی",
+          });
+        }
       });
-    }
   }, []);
 
   return (

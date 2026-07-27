@@ -77,23 +77,105 @@ export default function AdminServicesPage() {
     }
   };
 
-  const handleFileUpload = async (id: string, file: File) => {
-    const formData = new FormData();
-    formData.append("receipt", file);
-    formData.append("bookingId", "service-photo-" + id);
+  async function compressImage(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1000;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", 0.75));
+        };
+        img.onerror = () => resolve(reader.result as string);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error("Error reading image"));
+      reader.readAsDataURL(file);
+    });
+  }
 
+  const handleFileUpload = async (id: string, file: File) => {
     try {
-      const res = await fetch("/api/payment/upload", {
-        method: "POST",
-        body: formData,
-      });
-      if (res.ok) {
-        // Generate photo path
-        const fakePath = "/images/gallery/" + file.name;
-        setEditImage((prev) => ({ ...prev, [id]: fakePath }));
+      const base64Data = await compressImage(file);
+      if (id === "new") {
+        setNewImage(base64Data);
+        setMessage(`عکس خدمت جدید انتخاب شد: ${file.name}`);
+      } else {
+        setEditImage((prev) => ({ ...prev, [id]: base64Data }));
         setMessage(`عکس جدید انتخاب شد: ${file.name}`);
       }
-    } catch {}
+    } catch {
+      setMessage("خطا در پردازش تصویر");
+    }
+  };
+
+  const handleCreateService = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName || !newPrice) {
+      setMessage("نام و قیمت خدمت الزامی است");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/services", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newName,
+          description: newDesc,
+          price: newPrice,
+          image: newImage,
+        }),
+      });
+      if (res.ok) {
+        setMessage("خدمت جدید با موفقیت اضافه شد ✨");
+        setNewName("");
+        setNewDesc("");
+        setNewPrice("");
+        setNewImage("");
+        loadServices();
+      }
+    } catch {
+      setMessage("خطا در ایجاد خدمت");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteService = async (id: string, name: string) => {
+    if (!confirm(`آیا از حذف خدمت "${name}" اطمینان دارید؟`)) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/services", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        setMessage(`خدمت "${name}" حذف شد`);
+        loadServices();
+      }
+    } catch {
+      setMessage("خطا در حذف خدمت");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-text-muted">در حال بارگذاری...</p></div>;
@@ -114,6 +196,75 @@ export default function AdminServicesPage() {
             {message}
           </div>
         )}
+
+        {/* Create New Service Form */}
+        <div className="glass-card p-6 mb-8 border border-[var(--color-accent)]/30 bg-gradient-to-br from-[var(--color-accent)]/5 to-transparent">
+          <h2 className="text-lg font-bold text-[var(--color-fg)] mb-4 flex items-center gap-2">
+            <span>➕</span> افزودن خدمت / محصول جدید
+          </h2>
+          <form onSubmit={handleCreateService} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-[var(--color-muted)] mb-1">نام خدمت جدید</label>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="مثال: اکستنشن مژه هیبرید"
+                  className="input-field text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-[var(--color-muted)] mb-1">قیمت (تومان)</label>
+                <input
+                  type="number"
+                  value={newPrice}
+                  onChange={(e) => setNewPrice(e.target.value)}
+                  placeholder="مثال: 1500000"
+                  className="input-field text-sm"
+                  dir="ltr"
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-[var(--color-muted)] mb-1">توضیحات خدمت</label>
+              <input
+                type="text"
+                value={newDesc}
+                onChange={(e) => setNewDesc(e.target.value)}
+                placeholder="توضیحات کوتاه درباره خدمت..."
+                className="input-field text-sm"
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <input
+                type="text"
+                value={newImage}
+                onChange={(e) => setNewImage(e.target.value)}
+                placeholder="آدرس عکس یا آپلود از سیستم..."
+                className="input-field text-xs sm:flex-1 font-mono"
+                dir="ltr"
+              />
+              <label className="btn-ghost text-xs py-2.5 px-4 cursor-pointer whitespace-nowrap">
+                📷 آپلود عکس خدمت جدید
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleFileUpload("new", f);
+                  }}
+                />
+              </label>
+            </div>
+            <button type="submit" disabled={loading} className="btn-primary w-full text-sm py-2.5 cursor-pointer">
+              ✨ ثبت و انتشار خدمت جدید
+            </button>
+          </form>
+        </div>
 
         <div className="space-y-6">
           {services.map((service) => (
@@ -192,13 +343,22 @@ export default function AdminServicesPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleUpdateService(service.id)}
-                  disabled={loading}
-                  className="btn-primary w-full text-sm py-2.5 cursor-pointer mt-2"
-                >
-                  ذخیره تغییرات و آپدیت خدمت
-                </button>
+                <div className="flex items-center gap-3 mt-2">
+                  <button
+                    onClick={() => handleUpdateService(service.id)}
+                    disabled={loading}
+                    className="btn-primary flex-1 text-sm py-2.5 cursor-pointer"
+                  >
+                    ذخیره تغییرات و آپدیت خدمت
+                  </button>
+                  <button
+                    onClick={() => handleDeleteService(service.id, service.name)}
+                    disabled={loading}
+                    className="btn-ghost text-danger border-danger/30 hover:bg-danger/10 text-sm py-2.5 px-6 cursor-pointer"
+                  >
+                    🗑️ حذف
+                  </button>
+                </div>
               </div>
             </div>
           ))}

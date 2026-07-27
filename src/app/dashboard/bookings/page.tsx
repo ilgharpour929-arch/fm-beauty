@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatJalali } from "@/lib/jalali";
 
 export default function UserBookingsPage() {
   const { data: session, status } = useSession();
@@ -16,7 +17,10 @@ export default function UserBookingsPage() {
 
   useEffect(() => {
     if (session) {
-      fetch("/api/bookings")
+      fetch("/api/bookings", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache, no-store, must-revalidate", Pragma: "no-cache" },
+      })
         .then((r) => r.json())
         .then(setBookings)
         .catch(() => {});
@@ -26,12 +30,12 @@ export default function UserBookingsPage() {
   if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-text-muted">در حال بارگذاری...</p></div>;
 
   const statusLabels: Record<string, { text: string; color: string }> = {
-    PENDING_DEPOSIT: { text: "منتظر پرداخت", color: "text-text-primary bg-text-primary/10" },
-    WAITING_APPROVAL: { text: "در انتظار تأیید", color: "text-accent-400 bg-accent-500/10" },
-    CONFIRMED: { text: "تأیید شده", color: "text-success bg-success/10" },
-    COMPLETED: { text: "انجام شده", color: "text-text-muted bg-text-primary/5" },
-    CANCELLED: { text: "لغو شده", color: "text-danger bg-danger/10" },
-    REJECTED: { text: "رد شده", color: "text-danger bg-danger/10" },
+    PENDING_DEPOSIT: { text: "منتظر پرداخت ⏳", color: "text-amber-300 bg-amber-500/20 border border-amber-500/30 font-medium" },
+    WAITING_APPROVAL: { text: "⚡ در انتظار تأیید سالن", color: "text-purple-200 bg-purple-500/25 border border-purple-400/50 animate-pulse shadow-[0_0_12px_rgba(168,85,247,0.3)] font-bold" },
+    CONFIRMED: { text: "✓ تأیید شده", color: "text-emerald-200 bg-emerald-500/25 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.25)] font-bold" },
+    COMPLETED: { text: "انجام شده", color: "text-slate-300 bg-slate-500/20 border border-slate-500/30" },
+    CANCELLED: { text: "لغو شده", color: "text-rose-300 bg-rose-500/15" },
+    REJECTED: { text: "رد شده", color: "text-rose-300 bg-rose-500/15" },
   };
 
   const handleCancel = async (id: string) => {
@@ -74,7 +78,7 @@ export default function UserBookingsPage() {
                     <div className="flex-1">
                       <h3 className="font-semibold text-text-primary">{booking.service.name}</h3>
                       <p className="text-sm text-text-muted mt-1">
-                        {booking.date} | {booking.startTime}
+                        {formatJalali(booking.date)} | {booking.startTime}
                       </p>
                       {booking.note && (
                         <p className="text-xs text-text-muted/70 mt-1">یادداشت: {booking.note}</p>

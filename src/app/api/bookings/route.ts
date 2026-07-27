@@ -3,6 +3,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { memoryStore } from "@/lib/store";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user) {
@@ -16,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "همه فیلدها الزامی هستند" }, { status: 400 });
     }
 
-    let service = await prisma.service.findUnique({ where: { id: serviceId } }).catch(() => null);
+    let service: any = await prisma.service.findUnique({ where: { id: serviceId } }).catch(() => null);
     if (!service) {
       const staticServices: Record<string, { name: string; price: number }> = {
         volume: { name: "اکستنشن مژه والیوم", price: 1800000 },
@@ -26,7 +29,7 @@ export async function POST(request: NextRequest) {
         "lash-lift": { name: "لیفت مژه و لمینیت", price: 1200000 },
         "brow-lift": { name: "لیفت ابرو", price: 1200000 },
       };
-      service = (staticServices[serviceId] as any) || { name: "خدمت زیبایی مژه", price: 1500000 };
+      service = staticServices[serviceId] || { name: "خدمت زیبایی مژه", price: 1500000 };
     }
 
     // Check memoryStore for slot conflicts
@@ -47,8 +50,16 @@ export async function POST(request: NextRequest) {
 
     const depositAmount = Math.round(service.price * 0.3);
     const userId = (session.user as any)?.id || "user-id";
-    const userName = session.user?.name || "مشتری آنلاین";
     const userPhone = (session.user as any)?.phone || "09120000000";
+    let userName = session.user?.name || "مشتری آنلاین";
+
+    // Lookup real name from memoryStore if it's generic
+    if (!userName || userName === "کاربر گرامی" || userName.startsWith("مشتری")) {
+      const foundUser = memoryStore.getUsers().find((u) => u.phone === userPhone || u.id === userId);
+      if (foundUser && foundUser.firstName) {
+        userName = `${foundUser.firstName} ${foundUser.lastName}`.trim();
+      }
+    }
 
     const bookingId = "bk-" + Date.now();
 
@@ -66,7 +77,7 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
       user: {
         firstName: userName.split(" ")[0] || "مشتری",
-        lastName: userName.split(" ")[1] || "گرامی",
+        lastName: userName.split(" ").slice(1).join(" ") || `(${userPhone})`,
         phone: userPhone,
       },
       service: {

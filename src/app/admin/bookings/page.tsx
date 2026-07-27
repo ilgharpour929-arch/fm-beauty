@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatJalali } from "@/lib/jalali";
 
 export default function AdminBookingsPage() {
   const { data: session, status } = useSession();
@@ -23,7 +24,10 @@ export default function AdminBookingsPage() {
 
   const loadBookings = () => {
     if (user?.role === "ADMIN") {
-      fetch("/api/admin/bookings")
+      fetch("/api/admin/bookings", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache, no-store, must-revalidate", Pragma: "no-cache" },
+      })
         .then((r) => r.json())
         .then((data) => {
           if (Array.isArray(data)) setBookings(data);
@@ -76,10 +80,10 @@ export default function AdminBookingsPage() {
   if (user?.role !== "ADMIN") return null;
 
   const statusLabels: Record<string, { text: string; bg: string; color: string }> = {
-    PENDING_DEPOSIT: { text: "در انتظار پرداخت", bg: "bg-amber-500/15", color: "text-amber-300" },
-    WAITING_APPROVAL: { text: "در انتظار تأیید شما", bg: "bg-purple-500/20", color: "text-purple-300" },
-    CONFIRMED: { text: "تأیید شده ✓", bg: "bg-emerald-500/20", color: "text-emerald-300" },
-    COMPLETED: { text: "انجام شده", bg: "bg-slate-500/20", color: "text-slate-300" },
+    PENDING_DEPOSIT: { text: "در انتظار پرداخت ⏳", bg: "bg-amber-500/20 border border-amber-500/30", color: "text-amber-300 font-medium" },
+    WAITING_APPROVAL: { text: "⚡ در انتظار تأیید شما", bg: "bg-purple-500/25 border border-purple-400/50 animate-pulse shadow-[0_0_15px_rgba(168,85,247,0.35)]", color: "text-purple-200 font-bold" },
+    CONFIRMED: { text: "✓ تأیید شده", bg: "bg-emerald-500/25 border border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.25)]", color: "text-emerald-200 font-bold" },
+    COMPLETED: { text: "انجام شده", bg: "bg-slate-500/20 border border-slate-500/30", color: "text-slate-300" },
     CANCELLED: { text: "لغو شده", bg: "bg-rose-500/15", color: "text-rose-300" },
     REJECTED: { text: "رد شده", bg: "bg-rose-500/15", color: "text-rose-300" },
   };
@@ -155,9 +159,12 @@ export default function AdminBookingsPage() {
               <tbody>
                 {displayedBookings.map((booking) => {
                   const st = statusLabels[booking.status] || { text: booking.status, bg: "bg-slate-500/10", color: "text-slate-300" };
-                  const clientName = (booking.user?.firstName || booking.user?.lastName)
+                  let clientName = (booking.user?.firstName || booking.user?.lastName)
                     ? `${booking.user.firstName || ""} ${booking.user.lastName || ""}`.trim()
                     : "مشتری آنلاین";
+                  if (clientName === "کاربر گرامی" || clientName === "کاربر" || clientName === "مشتری گرامی") {
+                    clientName = `مشتری (${booking.user?.phone || "تلفن ثبت نشده"})`;
+                  }
 
                   return (
                     <tr key={booking.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
@@ -169,7 +176,7 @@ export default function AdminBookingsPage() {
                       </td>
                       <td className="p-3 text-[var(--color-fg)]">{booking.service?.name}</td>
                       <td className="p-3 text-[var(--color-muted)] text-xs">
-                        {booking.date} | {booking.startTime}
+                        {formatJalali(booking.date)} | {booking.startTime}
                       </td>
                       <td className="p-3 font-bold text-[var(--color-accent)]">
                         {booking.depositAmount?.toLocaleString("fa-IR")} تومان
@@ -235,9 +242,12 @@ export default function AdminBookingsPage() {
           <div className="md:hidden space-y-4">
             {displayedBookings.map((booking) => {
               const st = statusLabels[booking.status] || { text: booking.status, bg: "bg-slate-500/10", color: "text-slate-300" };
-              const clientName = (booking.user?.firstName || booking.user?.lastName)
+              let clientName = (booking.user?.firstName || booking.user?.lastName)
                 ? `${booking.user.firstName || ""} ${booking.user.lastName || ""}`.trim()
                 : "مشتری آنلاین";
+              if (clientName === "کاربر گرامی" || clientName === "کاربر" || clientName === "مشتری گرامی") {
+                clientName = `مشتری (${booking.user?.phone || "تلفن ثبت نشده"})`;
+              }
 
               return (
                 <div key={booking.id} className="glass-card-dark p-4 space-y-3 border border-white/5">
@@ -258,7 +268,7 @@ export default function AdminBookingsPage() {
                   <div className="text-sm font-medium text-[var(--color-accent-2)]">{booking.service?.name}</div>
 
                   <div className="flex justify-between text-xs text-[var(--color-muted)]">
-                    <span>{booking.date} | {booking.startTime}</span>
+                    <span>{formatJalali(booking.date)} | {booking.startTime}</span>
                     <span className="font-bold text-[var(--color-accent)]">{booking.depositAmount?.toLocaleString("fa-IR")} تومان</span>
                   </div>
 

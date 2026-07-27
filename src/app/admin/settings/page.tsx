@@ -20,24 +20,49 @@ export default function AdminSettingsPage() {
     if (status === "unauthenticated") router.push("/auth/login");
     if (status === "authenticated" && user?.role !== "ADMIN") router.push("/");
     
-    // Load from localStorage if present
-    const savedCard = localStorage.getItem("bank_cardNumber");
-    const savedHolder = localStorage.getItem("bank_accountHolder");
-    const savedBank = localStorage.getItem("bank_name");
-    const savedShaba = localStorage.getItem("bank_shaba");
+    // Load from server API first, fallback to localStorage
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data) {
+          if (data.cardNumber) setCardNumber(data.cardNumber);
+          if (data.accountHolder) setAccountHolder(data.accountHolder);
+          if (data.bank) setBank(data.bank);
+          if (data.shaba) setShaba(data.shaba);
+        }
+      })
+      .catch(() => {
+        const savedCard = localStorage.getItem("bank_cardNumber");
+        const savedHolder = localStorage.getItem("bank_accountHolder");
+        const savedBank = localStorage.getItem("bank_name");
+        const savedShaba = localStorage.getItem("bank_shaba");
 
-    if (savedCard) setCardNumber(savedCard);
-    if (savedHolder) setAccountHolder(savedHolder);
-    if (savedBank) setBank(savedBank);
-    if (savedShaba) setShaba(savedShaba);
+        if (savedCard) setCardNumber(savedCard);
+        if (savedHolder) setAccountHolder(savedHolder);
+        if (savedBank) setBank(savedBank);
+        if (savedShaba) setShaba(savedShaba);
+      });
   }, [status, user, router]);
 
-  function handleSave(e: React.FormEvent) {
+  async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     localStorage.setItem("bank_cardNumber", cardNumber);
     localStorage.setItem("bank_accountHolder", accountHolder);
     localStorage.setItem("bank_name", bank);
     localStorage.setItem("bank_shaba", shaba);
+
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cardNumber,
+          accountHolder,
+          bank,
+          shaba,
+        }),
+      });
+    } catch {}
 
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);

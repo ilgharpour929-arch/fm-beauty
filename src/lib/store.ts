@@ -45,6 +45,13 @@ export interface BlockedDateRecord {
   reason: string;
 }
 
+export interface BankSettingsRecord {
+  cardNumber: string;
+  accountHolder: string;
+  bank: string;
+  shaba: string;
+}
+
 const INITIAL_SERVICES: ServiceRecord[] = [
   { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, duration: 90, image: "/images/gallery/valyum.jpg" },
   { id: "spiky", name: "اکستنشن مژه اسپایکی", description: "مژه‌های فرچه‌ای با ظاهری جذاب و چشمگیر", price: 1500000, duration: 90, image: "/images/gallery/spayki.jpg" },
@@ -59,6 +66,7 @@ const globalStore = globalThis as unknown as {
   __bookingsStore?: BookingRecord[];
   __blockedDatesStore?: BlockedDateRecord[];
   __servicesStore?: ServiceRecord[];
+  __bankSettingsStore?: BankSettingsRecord;
 };
 
 if (!globalStore.__usersStore) {
@@ -84,6 +92,15 @@ if (!globalStore.__blockedDatesStore) {
 
 if (!globalStore.__servicesStore) {
   globalStore.__servicesStore = INITIAL_SERVICES;
+}
+
+if (!globalStore.__bankSettingsStore) {
+  globalStore.__bankSettingsStore = {
+    cardNumber: "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
+    accountHolder: "فاطمه محمدی",
+    bank: "بانک ملی",
+    shaba: "IR120170000000123456789012",
+  };
 }
 
 export const memoryStore = {
@@ -164,5 +181,32 @@ export const memoryStore = {
   addService: (service: ServiceRecord) => {
     if (!globalStore.__servicesStore) globalStore.__servicesStore = INITIAL_SERVICES;
     globalStore.__servicesStore.unshift(service);
+  },
+  removeService: (id: string) => {
+    if (!globalStore.__servicesStore) return;
+    globalStore.__servicesStore = globalStore.__servicesStore.filter((s) => s.id !== id);
+  },
+
+  // Bank & Payment Settings
+  getBankSettings: () => {
+    return (
+      globalStore.__bankSettingsStore || {
+        cardNumber: "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
+        accountHolder: "فاطمه محمدی",
+        bank: "بانک ملی",
+        shaba: "IR120170000000123456789012",
+      }
+    );
+  },
+  updateBankSettings: (settings: Partial<BankSettingsRecord>) => {
+    if (!globalStore.__bankSettingsStore) {
+      globalStore.__bankSettingsStore = {
+        cardNumber: "۶۰۳۷-۷۵۹۱-۱۲۳۴-۵۶۷۸",
+        accountHolder: "فاطمه محمدی",
+        bank: "بانک ملی",
+        shaba: "IR120170000000123456789012",
+      };
+    }
+    globalStore.__bankSettingsStore = { ...globalStore.__bankSettingsStore, ...settings };
   },
 };

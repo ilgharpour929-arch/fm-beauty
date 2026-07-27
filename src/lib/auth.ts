@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 function normalizePhone(phone: string): string {
   const persianNumbers = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
@@ -36,6 +37,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           },
         }).catch(() => null);
 
+        // Check memoryStore if not in prisma
+        if (!user) {
+          const memUser = memoryStore.getUsers().find((u) => normalizePhone(u.phone) === phone || u.phone === credentials.phone);
+          if (memUser) {
+            return {
+              id: memUser.id,
+              name: `${memUser.firstName} ${memUser.lastName}`.trim() || `مشتری (${phone})`,
+              phone: memUser.phone,
+              role: memUser.role,
+            };
+          }
+        }
+
         // Guaranteed fallback for Employer / Admin login on any environment (Vercel / Local)
         if (!user && (phone === "09141898006" || phone === "09120000000") && password === "admin123") {
           return {
@@ -49,7 +63,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!user && password.length >= 6 && phone.length >= 10) {
           return {
             id: "user-" + phone,
-            name: "کاربر گرامی",
+            name: `مشتری (${phone})`,
             phone: phone,
             role: "CUSTOMER",
           };

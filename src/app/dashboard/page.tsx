@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatJalali } from "@/lib/jalali";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -16,7 +17,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (session) {
-      fetch("/api/bookings")
+      fetch("/api/bookings", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache, no-store, must-revalidate", Pragma: "no-cache" },
+      })
         .then((r) => r.json())
         .then(setBookings)
         .catch(() => {});
@@ -67,7 +71,7 @@ export default function DashboardPage() {
                 <div key={booking.id} className="glass-card-dark p-4 flex items-center justify-between">
                   <div>
                     <div className="font-medium text-text-primary text-sm">{booking.service.name}</div>
-                    <div className="text-xs text-text-muted mt-1">{booking.date} | {booking.startTime}</div>
+                    <div className="text-xs text-text-muted mt-1">{formatJalali(booking.date)} | {booking.startTime}</div>
                   </div>
                   <span className={`text-xs px-3 py-1 rounded-full ${
                       booking.status === "CONFIRMED" ? "bg-success/10 text-success" :

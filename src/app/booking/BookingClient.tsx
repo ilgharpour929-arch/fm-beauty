@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import PersianDatePickerInput from "@/components/PersianDatePickerInput";
+import { formatJalali } from "@/lib/jalali";
 
 interface Service {
   id: string;
@@ -264,13 +266,13 @@ export default function BookingClient() {
                   className="glass-card p-6"
                 >
                   <h2 className="text-lg font-semibold text-[var(--color-fg)] mb-4">انتخاب تاریخ و ساعت</h2>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => { setSelectedDate(e.target.value); setSelectedSlot(""); }}
-                    min={today}
-                    className="input-field mb-4"
-                  />
+                  <div className="mb-6 z-30 relative">
+                    <PersianDatePickerInput
+                      selectedDate={selectedDate}
+                      onSelectDate={(d) => { setSelectedDate(d); setSelectedSlot(""); }}
+                      minDate={today}
+                    />
+                  </div>
                   {selectedDate && (
                     <>
                       {slotsLoading ? (
@@ -372,7 +374,7 @@ export default function BookingClient() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--color-muted)]">تاریخ:</span>
-                  <span className="text-[var(--color-fg)]">{selectedDate || "—"}</span>
+                  <span className="text-[var(--color-fg)]">{formatJalali(selectedDate)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--color-muted)]">ساعت:</span>

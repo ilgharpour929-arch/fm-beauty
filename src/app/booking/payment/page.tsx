@@ -52,14 +52,14 @@ function PaymentForm() {
     reader.onload = async () => {
       const base64Data = reader.result as string;
 
-      const formData = new FormData();
-      formData.append("receipt", file);
-      formData.append("bookingId", bookingId);
-
       try {
         const res = await fetch("/api/payment/upload", {
           method: "POST",
-          body: formData,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bookingId,
+            receiptImage: base64Data,
+          }),
         });
 
         if (res.ok) {

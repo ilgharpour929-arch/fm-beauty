@@ -13,21 +13,29 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const formData = await request.formData();
-    const receipt = formData.get("receipt") as File;
-    const bookingId = formData.get("bookingId") as string;
+    let bookingId = "";
+    let receiptImage = "";
 
-    if (!receipt || !bookingId) {
-      return NextResponse.json({ error: "فیش و شناسه رزرو الزامی است" }, { status: 400 });
+    const contentType = request.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+      const body = await request.json();
+      bookingId = body.bookingId;
+      receiptImage = body.receiptImage;
+    } else {
+      const formData = await request.formData();
+      const receipt = formData.get("receipt") as File;
+      bookingId = formData.get("bookingId") as string;
+      if (receipt) {
+        const buffer = Buffer.from(await receipt.arrayBuffer());
+        const base64 = buffer.toString("base64");
+        const mimeType = receipt.type || "image/jpeg";
+        receiptImage = `data:${mimeType};base64,${base64}`;
+      }
     }
 
-    let receiptImage = "";
-    try {
-      const buffer = Buffer.from(await receipt.arrayBuffer());
-      const base64 = buffer.toString("base64");
-      const mimeType = receipt.type || "image/jpeg";
-      receiptImage = `data:${mimeType};base64,${base64}`;
-    } catch {}
+    if (!bookingId) {
+      return NextResponse.json({ error: "شناسه رزرو الزامی است" }, { status: 400 });
+    }
 
     // Update memoryStore booking for instant admin visibility
     if (receiptImage) {

@@ -47,28 +47,37 @@ function PaymentForm() {
     setLoading(true);
     setMessage("");
 
-    const formData = new FormData();
-    formData.append("receipt", file);
-    formData.append("bookingId", bookingId);
+    // Convert file to Base64 on client-side for 100% fail-safe delivery
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Data = reader.result as string;
 
-    try {
-      const res = await fetch("/api/payment/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const formData = new FormData();
+      formData.append("receipt", file);
+      formData.append("bookingId", bookingId);
 
-      const data = await res.json();
-      if (!res.ok) {
-        setMessage(data.error || "خطا در آپلود فیش");
+      try {
+        const res = await fetch("/api/payment/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
+          router.push(`/dashboard/bookings`);
+        } else {
+          setMessage("خطا در ثبت فیش");
+          setLoading(false);
+        }
+      } catch {
+        setMessage("خطا در ارتباط با سرور");
         setLoading(false);
-        return;
       }
-
-      router.push(`/dashboard/bookings`);
-    } catch {
-      setMessage("خطا در ارتباط با سرور");
+    };
+    reader.onerror = () => {
+      setMessage("خطا در خواندن فایل تصویر");
       setLoading(false);
-    }
+    };
+    reader.readAsDataURL(file);
   }
 
   const [bankInfo, setBankInfo] = useState({

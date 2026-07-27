@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 const FALLBACK_SERVICES = [
   { id: "volume", name: "اکستنشن مژه والیوم", description: "مژه‌های حجیم و پرپشت با تکنیک والیوم", price: 1800000, duration: 90, image: "/images/gallery/valyum.jpg", isActive: true },
@@ -19,9 +20,8 @@ export async function GET() {
     if (services && services.length > 0) {
       return NextResponse.json(services);
     }
-    return NextResponse.json(FALLBACK_SERVICES);
-  } catch (error) {
-    console.error("Error in GET /api/services:", error);
-    return NextResponse.json(FALLBACK_SERVICES);
-  }
+  } catch {}
+
+  const memServices = memoryStore.getServices();
+  return NextResponse.json(memServices);
 }

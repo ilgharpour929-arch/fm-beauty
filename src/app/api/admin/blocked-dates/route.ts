@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 export async function GET() {
   const session = await auth();
@@ -8,8 +9,13 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const blockedDates = await prisma.blockedDate.findMany({ orderBy: { date: "asc" } });
-  return NextResponse.json(blockedDates);
+  try {
+    const dbBlocked = await prisma.blockedDate.findMany({ orderBy: { date: "asc" } });
+    if (dbBlocked && dbBlocked.length > 0) return NextResponse.json(dbBlocked);
+  } catch {}
+
+  const memBlocked = memoryStore.getBlockedDates();
+  return NextResponse.json(memBlocked);
 }
 
 export async function POST(request: NextRequest) {
@@ -19,8 +25,13 @@ export async function POST(request: NextRequest) {
   }
 
   const { date, reason } = await request.json();
-  const blocked = await prisma.blockedDate.create({ data: { date, reason: reason || "" } });
-  return NextResponse.json(blocked);
+  memoryStore.addBlockedDate(date, reason);
+
+  try {
+    await prisma.blockedDate.create({ data: { date, reason: reason || "" } });
+  } catch {}
+
+  return NextResponse.json({ success: true, date, reason });
 }
 
 export async function DELETE(request: NextRequest) {
@@ -30,6 +41,11 @@ export async function DELETE(request: NextRequest) {
   }
 
   const { date } = await request.json();
-  await prisma.blockedDate.delete({ where: { date } });
+  memoryStore.removeBlockedDate(date);
+
+  try {
+    await prisma.blockedDate.delete({ where: { date } });
+  } catch {}
+
   return NextResponse.json({ success: true });
 }

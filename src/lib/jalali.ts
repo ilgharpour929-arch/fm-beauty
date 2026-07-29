@@ -28,6 +28,13 @@ export function toPersianDigits(num: number | string): string {
   return String(num).replace(/\d/g, (d) => PERSIAN_DIGITS[parseInt(d)]);
 }
 
+export function parseSafeInt(str: string): number {
+  const englishStr = str
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776))
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632));
+  return parseInt(englishStr, 10);
+}
+
 export function getJalaliParts(date: Date): JalaliDateParts {
   const dtf = new Intl.DateTimeFormat("en-US-u-ca-persian", {
     year: "numeric",
@@ -40,9 +47,9 @@ export function getJalaliParts(date: Date): JalaliDateParts {
   let day = 0;
 
   for (const part of parts) {
-    if (part.type === "year") year = parseInt(part.value, 10);
-    if (part.type === "month") month = parseInt(part.value, 10);
-    if (part.type === "day") day = parseInt(part.value, 10);
+    if (part.type === "year") year = parseSafeInt(part.value);
+    if (part.type === "month") month = parseSafeInt(part.value);
+    if (part.type === "day") day = parseSafeInt(part.value);
   }
   return { year, month, day };
 }

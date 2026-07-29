@@ -85,14 +85,14 @@ export default function PersianDatePickerInput({
       {/* Backdrop to close when clicking outside */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]"
+          className="fixed inset-0 z-40 bg-black/60 sm:bg-black/20 sm:backdrop-blur-[1px] transition-opacity"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Popup Persian Calendar Menu */}
       {isOpen && (
-        <div className="absolute top-full right-0 left-0 mt-3 z-50 animate-float-up shadow-2xl">
+        <div className="fixed inset-x-0 bottom-0 p-4 pb-8 z-50 animate-float-up shadow-2xl sm:absolute sm:top-full sm:bottom-auto sm:inset-x-auto sm:right-0 sm:left-0 sm:mt-3 sm:p-0">
           <PersianCalendar
             selectedDate={selectedDate}
             onSelectDate={(dateStr) => {

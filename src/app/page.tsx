@@ -66,13 +66,24 @@ export default async function HomePage() {
               <div key={service.id} className="glass-card overflow-hidden group hover:-translate-y-2 transition-all duration-500 hover:shadow-[0_20px_40px_rgba(139,92,246,0.15)] border border-transparent hover:border-white/10 relative">
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/5 to-transparent pointer-events-none z-10" />
                 <div className="relative h-56 overflow-hidden">
-                  <Image
-                    src={service.image || "/images/gallery/nemune-1.jpg"}
-                    alt={service.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
-                  />
+                  {service.image?.endsWith(".mp4") ? (
+                    <video
+                      src={service.image}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
+                    />
+                  ) : (
+                    <Image
+                      src={service.image || "/images/gallery/nemune-1.jpg"}
+                      alt={service.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)] via-[var(--color-bg)]/10 to-transparent" />
                 </div>
                 <div className="p-6">

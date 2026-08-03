@@ -47,6 +47,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
     { num: 1, label: "انتخاب خدمت" },
     { num: 2, label: "تاریخ و ساعت" },
     { num: 3, label: "توضیحات" },
+    { num: 4, label: "تأیید" },
   ];
 
   const MotionDiv = motion.div as any;
@@ -211,9 +212,9 @@ export default function BookingClient() {
   return (
     <div className="min-h-screen px-4 py-8 pt-24">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-[var(--color-fg)] mb-2">رزرو نوبت</h1>
-          <p className="text-[var(--color-muted)]">تاریخ و ساعت مورد نظر خود را انتخاب کنید</p>
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-display font-medium text-[var(--color-fg)] mb-3">رزرو نوبت</h1>
+          <p className="text-[var(--color-muted)] font-light">مراحل زیر را برای رزرو وقت خود طی کنید</p>
         </div>
 
         <StepIndicator currentStep={step} />
@@ -331,22 +332,71 @@ export default function BookingClient() {
                   />
                 </MotionDiv>
               )}
+              {step === 4 && (
+                <MotionDiv
+                  key="step4"
+                  variants={stepVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  className="glass-card p-8"
+                >
+                  <div className="text-center mb-6">
+                    <h2 className="text-2xl font-display font-medium text-[var(--color-accent-2)] mb-2">تأیید نهایی و پرداخت</h2>
+                    <p className="text-[var(--color-muted)] text-sm">لطفاً اطلاعات رزرو خود را با دقت بررسی کنید.</p>
+                  </div>
+                  
+                  <div className="bg-[var(--color-card-solid)]/40 rounded-2xl p-6 border border-white/5 space-y-4 mb-8 text-sm">
+                    <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                      <span className="text-[var(--color-muted)]">خدمت انتخاب شده:</span>
+                      <span className="font-semibold">{selectedServiceData?.name}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                      <span className="text-[var(--color-muted)]">تاریخ مراجعه:</span>
+                      <span className="font-semibold">{formatJalali(selectedDate)}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                      <span className="text-[var(--color-muted)]">ساعت:</span>
+                      <span className="font-semibold">{selectedSlot}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-4 border-b border-white/10">
+                      <span className="text-[var(--color-muted)]">مبلغ کل:</span>
+                      <span className="font-semibold">{selectedServiceData?.price.toLocaleString("fa-IR")} تومان</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 text-[var(--color-accent-2)] text-base font-bold">
+                      <span>مبلغ پیش‌پرداخت (۳۰٪):</span>
+                      <span>{depositAmount.toLocaleString("fa-IR")} تومان</span>
+                    </div>
+                  </div>
+                  
+                  <MotionButton
+                    onClick={handleBooking}
+                    disabled={bookingLoading || !selectedService || !selectedDate || !selectedSlot}
+                    whileHover={!(bookingLoading || !selectedService || !selectedDate || !selectedSlot) ? { scale: 1.02 } : undefined}
+                    whileTap={!(bookingLoading || !selectedService || !selectedDate || !selectedSlot) ? { scale: 0.98 } : undefined}
+                    className="btn-primary w-full py-4 text-base cursor-pointer rounded-full shadow-[0_0_30px_rgba(139,92,246,0.4)] block lg:hidden"
+                  >
+                    {bookingLoading ? "در حال انتقال به درگاه..." : session ? "تأیید و پرداخت نهایی" : "ورود برای پرداخت"}
+                  </MotionButton>
+                </MotionDiv>
+              )}
             </AnimatePresence>
 
-            <div className="flex justify-between gap-4">
+            <div className="flex justify-between gap-4 mt-8">
               {step > 1 ? (
                 <MotionButton
                   onClick={() => setStep(step - 1)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-ghost text-sm py-2.5 px-6 cursor-pointer"
+                  className="btn-ghost text-sm py-3 px-8 cursor-pointer rounded-full"
                 >
                   مرحله قبل
                 </MotionButton>
               ) : (
                 <div />
               )}
-              {step < 3 ? (
+              {step < 4 ? (
                 <MotionButton
                   onClick={() => {
                     if (step === 1 && !selectedService) { setMessage("لطفاً یک خدمت را انتخاب کنید"); return; }
@@ -356,7 +406,7 @@ export default function BookingClient() {
                   }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-primary text-sm py-2.5 px-6 cursor-pointer"
+                  className="btn-primary text-sm py-3 px-8 cursor-pointer rounded-full shadow-[0_0_20px_rgba(139,92,246,0.3)]"
                 >
                   مرحله بعد
                 </MotionButton>
@@ -364,7 +414,7 @@ export default function BookingClient() {
             </div>
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 hidden lg:block">
             <div className="glass-card p-6 lg:sticky top-24">
               <h2 className="text-lg font-semibold text-[var(--color-fg)] mb-4">خلاصه رزرو</h2>
               <div className="space-y-3 text-sm">
@@ -395,15 +445,15 @@ export default function BookingClient() {
                 <p className="text-sm mt-3 text-[var(--color-danger)] text-center animate-shake">{message}</p>
               )}
 
-              {step === 3 && (
+              {step === 4 && (
                 <MotionButton
                   onClick={handleBooking}
                   disabled={bookingLoading || !selectedService || !selectedDate || !selectedSlot}
                   whileHover={!(bookingLoading || !selectedService || !selectedDate || !selectedSlot) ? { scale: 1.02 } : undefined}
                   whileTap={!(bookingLoading || !selectedService || !selectedDate || !selectedSlot) ? { scale: 0.98 } : undefined}
-                  className="btn-primary w-full mt-5 cursor-pointer"
+                  className="btn-primary w-full mt-5 cursor-pointer rounded-full shadow-[0_0_30px_rgba(139,92,246,0.4)]"
                 >
-                  {bookingLoading ? "در حال ثبت..." : session ? "ادامه و پرداخت" : "ورود برای رزرو"}
+                  {bookingLoading ? "در حال انتقال..." : session ? "پرداخت نهایی" : "ورود برای پرداخت"}
                 </MotionButton>
               )}
 

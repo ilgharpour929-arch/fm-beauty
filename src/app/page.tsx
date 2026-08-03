@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import { CinematicHero } from "@/components/CinematicHero";
 
 export const metadata: Metadata = {
   title: "صفحه اصلی | سالن زیبایی تخصصی مژه",
@@ -49,33 +50,8 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="min-h-[90vh] flex items-center px-6 pt-32 pb-20 relative">
-        <div className="max-w-7xl mx-auto w-full relative z-10">
-          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-[var(--color-accent)]/30 bg-gradient-to-r from-[var(--color-accent)]/15 via-[var(--color-accent-2)]/10 to-transparent text-xs font-medium text-[var(--color-accent-2)] mb-8 shadow-lg shadow-[var(--color-accent)]/10 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-[var(--color-accent-2)] animate-pulse" />
-            مرکز تخصصی اکستنشن مژه و ابرو فاطمه محمدی در ارومیه
-          </div>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tight mb-8">
-            <span className="block text-[var(--color-fg)]">زیباییِ چشم‌های تو،</span>
-            <span className="bg-gradient-to-r from-[var(--color-accent)] via-[var(--color-accent-2)] to-[var(--color-accent-3)] bg-clip-text text-transparent">
-              تخصص و هنرِ ماست
-            </span>
-          </h1>
-          <p className="text-lg md:text-xl text-[var(--color-muted)] max-w-xl leading-relaxed mb-10 font-normal">
-            ارائه تخصصی‌ترین خدمات اکستنشن مژه والیوم، اسپایکی، نچرال و لیفت ابرو با برترین مواد اروپایی. رزرو آنلاین بدون معطلی.
-          </p>
-          <div className="flex gap-4 flex-wrap">
-            <Link href="/booking" className="btn-primary text-lg px-10 py-3.5">
-              رزرو آنلاین
-            </Link>
-            <Link href="/services" className="btn-ghost text-lg px-10 py-3.5">
-              مشاهده خدمات
-            </Link>
-          </div>
-          <p className="text-sm text-[var(--color-muted)] mt-4">توسط فاطمه محمدی — بیش از ۵ سال تجربه حرفه‌ای</p>
-        </div>
-      </section>
+      {/* Cinematic Hero */}
+      <CinematicHero />
 
       {/* Services */}
       <section id="services" className="py-20 px-6">
@@ -87,16 +63,17 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((service) => (
-              <div key={service.id} className="glass-card overflow-hidden group hover:-translate-y-1 transition-all duration-350">
-                <div className="relative h-48 overflow-hidden">
+              <div key={service.id} className="glass-card overflow-hidden group hover:-translate-y-2 transition-all duration-500 hover:shadow-[0_20px_40px_rgba(139,92,246,0.15)] border border-transparent hover:border-white/10 relative">
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/5 to-transparent pointer-events-none z-10" />
+                <div className="relative h-56 overflow-hidden">
                   <Image
                     src={service.image || "/images/gallery/nemune-1.jpg"}
                     alt={service.name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    className="object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)] via-[var(--color-bg)]/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)] via-[var(--color-bg)]/10 to-transparent" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-semibold mb-2">{service.name}</h3>
@@ -152,21 +129,34 @@ export default async function HomePage() {
             <h2 className="text-4xl md:text-5xl font-bold mb-4">گالری تصاویر</h2>
             <p className="text-[var(--color-muted)] max-w-xl mx-auto">برخی از نمونه کارهای انجام شده در FM Beauty</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {galleryImages.map((img, i) => (
-              <div key={i} className="relative aspect-square rounded-2xl overflow-hidden group glass-card-borderless">
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 33vw"
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                  <span className="text-[var(--color-fg)] text-sm font-medium">{img.alt}</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[200px] gap-4">
+            {galleryImages.map((img, i) => {
+              // Create an asymmetric bento box layout
+              const spanClasses = [
+                "col-span-2 row-span-2", // Large
+                "col-span-2 row-span-1", // Wide
+                "col-span-1 row-span-2", // Tall
+                "col-span-1 row-span-1", // Small
+                "col-span-2 row-span-1", // Wide
+                "col-span-2 row-span-2", // Large
+              ];
+              const spanClass = spanClasses[i % spanClasses.length];
+              
+              return (
+                <div key={i} className={`relative rounded-3xl overflow-hidden group glass-card-borderless shadow-xl ${spanClass}`}>
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-[1.5s] ease-out"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120]/90 via-[#0B1120]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
+                    <span className="text-white text-base font-display font-medium tracking-wide translate-y-4 group-hover:translate-y-0 transition-transform duration-500">{img.alt}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

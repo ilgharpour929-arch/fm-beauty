@@ -4,23 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 
-const Logo = () => (
-  <svg width="32" height="32" viewBox="0 0 120 120" fill="none">
-    <defs>
-      <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#8B5CF6" />
-        <stop offset="50%" stopColor="#C084FC" />
-        <stop offset="100%" stopColor="#7DD3FC" />
-      </linearGradient>
-    </defs>
-    <circle cx="60" cy="60" r="54" stroke="url(#hdr)" strokeWidth="2" fill="rgba(30, 41, 59, 0.5)" />
-    <path d="M12 60c0-26.5 21.5-48 48-48s48 21.5 48 48" stroke="url(#hdr)" strokeWidth="1" strokeDasharray="3 5" opacity="0.5" fill="none" />
-    <path d="M32 85V30h32v8H44v18h16v8H44v21H32zM76 85V30h8l16 26 16-26h8v55h-12V52l-12 20-12-20v33H76z" fill="url(#hdr)" opacity="0.95" />
-    <path d="M80 30c6-8 16-12 24-7" stroke="url(#hdr)" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" fill="none" />
-    <path d="M32 30c0-6 6-9 12-6" stroke="url(#hdr)" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" fill="none" />
-    <circle cx="60" cy="98" r="3" fill="url(#hdr)" />
-  </svg>
-);
+import Image from "next/image";
 
 const navLinks = [
   { href: "/", label: "صفحه اصلی" },
@@ -53,9 +37,11 @@ export function Header() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 text-[var(--color-fg)] no-underline group">
-          <Logo />
-          <span className="font-display text-xl font-bold tracking-wide group-hover:text-[var(--color-accent)] transition-colors">
+        <Link href="/" className="flex items-center gap-3 text-[var(--color-fg)] no-underline group">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-[var(--color-accent)]/30 group-hover:border-[var(--color-accent)] transition-colors shadow-[0_0_10px_rgba(183,110,121,0.2)]">
+            <Image src="/images/logo.jpg" alt="FM Beauty Logo" fill className="object-cover" sizes="40px" />
+          </div>
+          <span className="font-display text-xl font-bold tracking-wider group-hover:text-[var(--color-accent)] transition-colors mt-1">
             FM Beauty
           </span>
         </Link>

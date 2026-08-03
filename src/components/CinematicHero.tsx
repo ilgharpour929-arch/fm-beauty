@@ -59,7 +59,7 @@ export function CinematicHero() {
       <div className="absolute inset-0 z-0">
         <video 
           ref={videoRef1}
-          src="https://zxdefgavgwfxastwmmjm.supabase.co/storage/v1/object/public/assets/flux.mp4"
+          src="/videos/hero.mp4"
           muted 
           playsInline 
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[900ms] ease-linear opacity-100"
@@ -67,7 +67,7 @@ export function CinematicHero() {
         />
         <video 
           ref={videoRef2}
-          src="https://zxdefgavgwfxastwmmjm.supabase.co/storage/v1/object/public/assets/flux.mp4"
+          src="/videos/hero.mp4"
           muted 
           playsInline 
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-[900ms] ease-linear opacity-0"

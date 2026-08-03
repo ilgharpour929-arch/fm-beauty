@@ -94,7 +94,7 @@ export function CinematicHero() {
           className="inline-flex items-center gap-3 mb-6"
         >
           <div className="h-[1px] w-8 bg-white/30" />
-          <span className="text-sm md:text-base tracking-[0.3em] uppercase text-white/80 font-medium">Ultra Lüks & Minimalist</span>
+          <span className="text-sm md:text-base tracking-[0.3em] uppercase text-white/80 font-medium">لوکس و مینیمالیست</span>
           <div className="h-[1px] w-8 bg-white/30" />
         </motion.div>
 
@@ -104,8 +104,8 @@ export function CinematicHero() {
           transition={{ duration: 1, ease: [0.2, 0.7, 0.2, 1], delay: 0.4 }}
           className="font-display text-6xl md:text-8xl lg:text-9xl font-medium tracking-tight leading-[1.05] text-white mb-6 drop-shadow-2xl"
         >
-          Kusursuz Güzellik, <br className="hidden md:block" />
-          <span className="text-white/80 italic">Eşsiz Zarafet.</span>
+          زیبایی بی‌نقص، <br className="hidden md:block" />
+          <span className="text-white/80 italic">ظرافت بی‌نظیر.</span>
         </motion.h1>
 
         <motion.p
@@ -114,7 +114,7 @@ export function CinematicHero() {
           transition={{ duration: 1, ease: [0.2, 0.7, 0.2, 1], delay: 0.6 }}
           className="text-lg md:text-xl text-white/70 max-w-2xl font-light mb-12 drop-shadow-md"
         >
-          FM Beauty dijital varlığını yeniden tanımlıyoruz. Modern, estetik ve profesyonel dokunuşlarla güzelliğinize değer katın.
+          ما حضور دیجیتال FM Beauty را بازتعریف می‌کنیم. با لمس‌های مدرن، زیبا و حرفه‌ای به زیبایی خود ارزش ببخشید.
         </motion.p>
 
         <motion.div
@@ -125,14 +125,14 @@ export function CinematicHero() {
         >
           <Link href="/booking" className="group relative overflow-hidden rounded-full bg-white/5 px-10 py-4 backdrop-blur-md border border-white/20 transition-all hover:bg-white/10 hover:border-white/40 shadow-[0_0_40px_rgba(255,255,255,0.05)] hover:shadow-[0_0_60px_rgba(255,255,255,0.15)]">
             <span className="relative z-10 flex items-center gap-2 text-white font-sans font-medium tracking-widest uppercase text-sm">
-              Randevu Al
+              رزرو نوبت
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transition-transform group-hover:-translate-x-1">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
               </svg>
             </span>
           </Link>
           <Link href="#services" className="text-white/60 hover:text-white transition-colors text-sm tracking-widest uppercase pb-1 border-b border-white/20 hover:border-white font-sans">
-            Hizmetleri Keşfet
+            مشاهده خدمات
           </Link>
         </motion.div>
       </div>

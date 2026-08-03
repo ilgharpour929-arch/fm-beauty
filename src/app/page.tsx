@@ -104,19 +104,24 @@ export default async function HomePage() {
             <h2 className="text-4xl md:text-5xl font-bold mb-4">چهار مرحله تا زیبایی</h2>
             <p className="text-[var(--color-muted)] max-w-xl mx-auto">فرآیند رزرو در FM Beauty ساده و سریع طراحی شده است.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {processSteps.map((step, i) => (
-              <div key={i} className="glass-card p-6 text-center relative overflow-hidden">
-                <div className="absolute top-4 right-4 text-5xl font-display font-bold text-[var(--color-accent)]/10 leading-none">
-                  {step.num}
+          <div className="relative mt-20">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden lg:block absolute top-[40px] left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-[var(--color-accent)]/30 to-transparent z-0" />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-16 lg:gap-6 relative z-10">
+              {processSteps.map((step, i) => (
+                <div key={i} className="relative flex flex-col items-center text-center group">
+                  <div className="w-20 h-20 mb-6 rounded-full bg-[#0B1120] border border-[var(--color-accent)]/30 group-hover:border-[var(--color-accent)] shadow-[0_0_15px_rgba(183,110,121,0.05)] group-hover:shadow-[0_0_30px_rgba(183,110,121,0.25)] flex items-center justify-center transition-all duration-500 relative z-10 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <span className="font-display text-3xl font-medium text-[var(--color-accent-2)] group-hover:scale-110 transition-transform duration-500">
+                      {step.num}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-display font-medium text-white mb-3">{step.title}</h3>
+                  <p className="text-sm text-white/60 leading-relaxed max-w-[220px] mx-auto">{step.desc}</p>
                 </div>
-                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 flex items-center justify-center text-[var(--color-accent)] font-bold text-lg">
-                  {step.num}
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
-                <p className="text-sm text-[var(--color-muted)]">{step.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>

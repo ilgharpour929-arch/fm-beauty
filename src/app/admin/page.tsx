@@ -2,8 +2,9 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatJalali } from "@/lib/jalali";
 
 const icons = {
   bookings: (
@@ -36,11 +37,44 @@ export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const user = session?.user as any;
+  
+  const [stats, setStats] = useState({ revenue: 0, totalBookings: 0, todayBookings: 0, loading: true });
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/auth/login");
     if (status === "authenticated" && user?.role !== "ADMIN") router.push("/");
   }, [status, user, router]);
+
+  useEffect(() => {
+    if (user?.role === "ADMIN") {
+      fetch("/api/admin/bookings")
+        .then(res => res.json())
+        .then((data: any[]) => {
+          if (!Array.isArray(data)) return;
+          const todayStr = new Date().toISOString().split("T")[0];
+          
+          let revenue = 0;
+          let todayCount = 0;
+          
+          data.forEach(b => {
+            if (b.status === "CONFIRMED" || b.status === "COMPLETED") {
+              revenue += b.depositAmount || 0; // Or b.service?.price if you want total revenue
+            }
+            if (b.date === todayStr && b.status !== "CANCELLED") {
+              todayCount++;
+            }
+          });
+          
+          setStats({
+            revenue,
+            totalBookings: data.length,
+            todayBookings: todayCount,
+            loading: false
+          });
+        })
+        .catch(() => setStats(s => ({ ...s, loading: false })));
+    }
+  }, [user]);
 
   if (status === "loading") return <div className="min-h-[60vh] flex items-center justify-center"><p className="text-[var(--color-muted)]">در حال بارگذاری...</p></div>;
 
@@ -58,10 +92,50 @@ export default function AdminPage() {
     <div className="min-h-screen px-4 py-8 pt-24">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8 animate-float-up">
-          <h1 className="text-2xl font-bold text-[var(--color-fg)]">پنل مدیریت</h1>
-          <p className="text-[var(--color-muted)]">خوش آمدید، {user?.name}</p>
+          <h1 className="text-3xl font-display font-medium text-[var(--color-fg)]">پنل مدیریت</h1>
+          <p className="text-[var(--color-muted)] font-light mt-2">خوش آمدید، {user?.name}</p>
         </div>
 
+        {/* Analytics Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+          <div className="glass-card p-6 flex flex-col justify-center relative overflow-hidden group">
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-[var(--color-accent)]/10 rounded-full blur-xl group-hover:bg-[var(--color-accent)]/20 transition-all duration-500" />
+            <span className="text-sm text-[var(--color-muted)] mb-2 z-10">مجموع درآمد تأیید شده (پیش‌پرداخت)</span>
+            {stats.loading ? (
+              <div className="h-8 bg-white/5 rounded animate-shimmer w-1/2" />
+            ) : (
+              <span className="text-3xl font-display font-medium text-[var(--color-accent)] z-10">
+                {stats.revenue.toLocaleString("fa-IR")} <span className="text-sm font-sans text-[var(--color-muted)]">تومان</span>
+              </span>
+            )}
+          </div>
+          
+          <div className="glass-card p-6 flex flex-col justify-center relative overflow-hidden group">
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition-all duration-500" />
+            <span className="text-sm text-[var(--color-muted)] mb-2 z-10">کل رزروهای ثبت شده</span>
+            {stats.loading ? (
+              <div className="h-8 bg-white/5 rounded animate-shimmer w-1/3" />
+            ) : (
+              <span className="text-3xl font-display font-medium text-blue-400 z-10">
+                {stats.totalBookings.toLocaleString("fa-IR")}
+              </span>
+            )}
+          </div>
+          
+          <div className="glass-card p-6 flex flex-col justify-center relative overflow-hidden group">
+            <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl group-hover:bg-emerald-500/20 transition-all duration-500" />
+            <span className="text-sm text-[var(--color-muted)] mb-2 z-10">رزروهای امروز ({formatJalali(new Date().toISOString().split("T")[0]).split(" ")[0]})</span>
+            {stats.loading ? (
+              <div className="h-8 bg-white/5 rounded animate-shimmer w-1/3" />
+            ) : (
+              <span className="text-3xl font-display font-medium text-emerald-400 z-10">
+                {stats.todayBookings.toLocaleString("fa-IR")}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <h2 className="text-xl font-medium text-[var(--color-fg)] mb-4">بخش‌های مدیریت</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {adminLinks.map((link, i) => (
             <Link

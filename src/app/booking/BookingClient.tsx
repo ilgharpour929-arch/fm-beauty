@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import PersianDatePickerInput from "@/components/PersianDatePickerInput";
+import PersianCalendar from "@/components/PersianCalendar";
 import { formatJalali } from "@/lib/jalali";
 
 interface Service {
@@ -266,9 +266,9 @@ export default function BookingClient() {
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                   className="glass-card p-6"
                 >
-                  <h2 className="text-lg font-semibold text-[var(--color-fg)] mb-4">انتخاب تاریخ و ساعت</h2>
-                  <div className="mb-6 z-30 relative">
-                    <PersianDatePickerInput
+                  <h2 className="text-lg font-semibold text-[var(--color-fg)] mb-6 text-center">انتخاب تاریخ و ساعت</h2>
+                  <div className="mb-10 flex justify-center relative z-30">
+                    <PersianCalendar
                       selectedDate={selectedDate}
                       onSelectDate={(d) => { setSelectedDate(d); setSelectedSlot(""); }}
                       minDate={today}

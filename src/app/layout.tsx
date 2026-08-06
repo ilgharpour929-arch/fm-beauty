@@ -3,6 +3,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SessionProvider } from "@/components/SessionProvider";
+import { CustomCursor } from "@/components/ui/CustomCursor";
 
 export const metadata: Metadata = {
   title: {
@@ -36,6 +37,42 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BeautySalon",
+    name: "FM Beauty",
+    image: "https://fmbeauty.ir/images/hero-bg.jpg",
+    "@id": "https://fmbeauty.ir",
+    url: "https://fmbeauty.ir",
+    telephone: "+989141898006",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "ارومیه",
+      addressLocality: "Urmia",
+      addressRegion: "West Azerbaijan",
+      addressCountry: "IR"
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 37.5527,
+      longitude: 45.0761
+    },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "Saturday",
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday"
+      ],
+      opens: "09:00",
+      closes: "19:00"
+    },
+    priceRange: "$$"
+  };
+
   return (
     <html lang="fa" dir="rtl" className="antialiased">
       <head>
@@ -45,8 +82,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="google" content="notranslate" />
         <meta name="geo.region" content="IR-02" />
         <meta name="geo.placename" content="Urmia" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className="min-h-screen flex flex-col">
+        <CustomCursor />
         <div className="floating-orbs" aria-hidden="true">
           <div className="orb orb-1" />
           <div className="orb orb-2" />

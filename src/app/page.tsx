@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { CinematicHero } from "@/components/CinematicHero";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "صفحه اصلی | سالن زیبایی تخصصی مژه",
@@ -62,8 +63,9 @@ export default async function HomePage() {
             <p className="text-[var(--color-muted)] max-w-xl mx-auto">تمام خدمات با دقت و ظرافت توسط فاطمه محمدی انجام می‌شود. هر جلسه ۹۰ دقیقه.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
-              <div key={service.id} className="glass-card overflow-hidden group hover:-translate-y-2 transition-all duration-500 hover:shadow-[0_20px_40px_rgba(139,92,246,0.15)] border border-transparent hover:border-white/10 relative">
+            {services.map((service, i) => (
+              <ScrollReveal key={service.id} delay={i * 0.1}>
+                <div className="glass-card overflow-hidden group hover:-translate-y-2 transition-all duration-500 hover:shadow-[0_20px_40px_rgba(139,92,246,0.15)] border border-transparent hover:border-white/10 relative h-full">
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-br from-white/5 to-transparent pointer-events-none z-10" />
                 <div className="relative h-56 overflow-hidden">
                   {service.image?.endsWith(".mp4") ? (
@@ -96,7 +98,7 @@ export default async function HomePage() {
                     <span className="text-xs text-[var(--color-muted)]/70">{service.duration} دقیقه</span>
                   </div>
                 </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
           <div className="text-center mt-10">
@@ -121,7 +123,8 @@ export default async function HomePage() {
             
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-16 lg:gap-6 relative z-10">
               {processSteps.map((step, i) => (
-                <div key={i} className="relative flex flex-col items-center text-center group">
+                <ScrollReveal key={i} delay={i * 0.15}>
+                  <div className="relative flex flex-col items-center text-center group h-full">
                   <div className="w-20 h-20 mb-6 rounded-full bg-[#0B1120] border border-[var(--color-accent)]/30 group-hover:border-[var(--color-accent)] shadow-[0_0_15px_rgba(183,110,121,0.05)] group-hover:shadow-[0_0_30px_rgba(183,110,121,0.25)] flex items-center justify-center transition-all duration-500 relative z-10 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-accent)]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <span className="font-display text-3xl font-medium text-[var(--color-accent-2)] group-hover:scale-110 transition-transform duration-500">
@@ -130,7 +133,8 @@ export default async function HomePage() {
                   </div>
                   <h3 className="text-xl font-display font-medium text-white mb-3">{step.title}</h3>
                   <p className="text-sm text-white/60 leading-relaxed max-w-[220px] mx-auto">{step.desc}</p>
-                </div>
+                  </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>
@@ -159,7 +163,8 @@ export default async function HomePage() {
               const spanClass = spanClasses[i % spanClasses.length];
               
               return (
-                <div key={i} className={`relative rounded-3xl overflow-hidden group glass-card-borderless shadow-xl ${spanClass}`}>
+                <ScrollReveal key={i} className={spanClass} delay={(i % 4) * 0.1}>
+                  <div className={`relative rounded-3xl overflow-hidden group glass-card-borderless shadow-xl w-full h-full`}>
                   <Image
                     src={img.src}
                     alt={img.alt}
@@ -170,7 +175,8 @@ export default async function HomePage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120]/90 via-[#0B1120]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
                     <span className="text-white text-base font-display font-medium tracking-wide translate-y-4 group-hover:translate-y-0 transition-transform duration-500">{img.alt}</span>
                   </div>
-                </div>
+                  </div>
+                </ScrollReveal>
               );
             })}
           </div>
@@ -185,13 +191,15 @@ export default async function HomePage() {
             { num: "۵۰۰+", label: "مشتریان راضی" },
             { num: "۱۰+", label: "خدمات تخصصی" },
             { num: "۹۸%", label: "رضایت مشتریان" },
-          ].map((stat) => (
-            <div key={stat.label} className="glass-card p-8 text-center">
+          ].map((stat, i) => (
+            <ScrollReveal key={stat.label} delay={i * 0.1}>
+              <div className="glass-card p-8 text-center h-full">
               <div className="font-display text-4xl font-bold bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-3)] bg-clip-text text-transparent">
                 {stat.num}
               </div>
               <div className="text-sm text-[var(--color-muted)] mt-2">{stat.label}</div>
-            </div>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>

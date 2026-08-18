@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 export async function GET(
   _request: Request,
@@ -12,21 +13,26 @@ export async function GET(
   }
 
   const { id } = await params;
-  let booking = await prisma.booking.findUnique({
+  let booking: any = await prisma.booking.findUnique({
     where: { id },
     include: { service: { select: { name: true, price: true } } },
   }).catch(() => null);
 
   if (!booking) {
-    return NextResponse.json({
-      id,
-      depositAmount: 450000,
-      serviceName: "اکستنشن مژه والیوم",
-      date: new Date().toISOString().split("T")[0],
-      startTime: "10:30",
-      status: "PENDING_DEPOSIT",
-      service: { name: "اکستنشن مژه والیوم", price: 1500000 }
-    });
+    const memBooking = memoryStore.getBookings().find((b) => b.id === id);
+    if (memBooking) {
+      booking = memBooking;
+    }
+  }
+
+  if (!booking) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  const userId = (session.user as any).id;
+  const role = (session.user as any).role;
+  if (role !== "ADMIN" && booking.userId !== userId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   return NextResponse.json(booking);

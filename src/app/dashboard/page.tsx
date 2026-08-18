@@ -22,7 +22,9 @@ export default function DashboardPage() {
         headers: { "Cache-Control": "no-cache, no-store, must-revalidate", Pragma: "no-cache" },
       })
         .then((r) => r.json())
-        .then(setBookings)
+        .then((data) => {
+          if (Array.isArray(data)) setBookings(data);
+        })
         .catch(() => {});
     }
   }, [session]);
@@ -70,7 +72,7 @@ export default function DashboardPage() {
               {bookings.slice(0, 5).map((booking) => (
                 <div key={booking.id} className="glass-card-dark p-4 flex items-center justify-between">
                   <div>
-                    <div className="font-medium text-text-primary text-sm">{booking.service.name}</div>
+                    <div className="font-medium text-text-primary text-sm">{booking.service?.name || "خدمت نامشخص"}</div>
                     <div className="text-xs text-text-muted mt-1">{formatJalali(booking.date)} | {booking.startTime}</div>
                   </div>
                   <span className={`text-xs px-3 py-1 rounded-full ${

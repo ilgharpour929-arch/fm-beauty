@@ -7,7 +7,7 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export const metadata: Metadata = {
   title: "صفحه اصلی | سالن زیبایی تخصصی مژه",
-  description: "اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت مژه و لیفت ابرو با بهترین کیفیت در تهران | رزرو آنلاین نوبت",
+  description: "اکستنشن مژه والیوم، اسپایکی، نچرال، لیفت مژه و لیفت ابرو با بهترین کیفیت در ارومیه | رزرو آنلاین نوبت",
 };
 
 const STATIC_SERVICES = [

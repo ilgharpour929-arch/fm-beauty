@@ -37,6 +37,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "شناسه رزرو الزامی است" }, { status: 400 });
     }
 
+    let booking: any = await prisma.booking.findUnique({ where: { id: bookingId } }).catch(() => null);
+    if (!booking) {
+      booking = memoryStore.getBookings().find((b) => b.id === bookingId);
+    }
+    
+    if (!booking) {
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    if (booking.userId !== (session.user as any).id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     // Update memoryStore booking for instant admin visibility
     if (receiptImage) {
       memoryStore.updateBookingReceipt(bookingId, receiptImage);
@@ -56,6 +69,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: "فیش واریزی با موفقیت ثبت شد" });
   } catch {
-    return NextResponse.json({ success: true, message: "فیش واریزی با موفقیت ثبت شد" });
+    return NextResponse.json({ error: "خطا در ثبت فیش" }, { status: 500 });
   }
 }

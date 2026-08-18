@@ -199,10 +199,16 @@ export default function BookingClient() {
       });
 
       const data = await res.json().catch(() => ({}));
-      const bId = data.bookingId || "bk-" + Date.now();
+      if (!res.ok) {
+        setMessage(data.error || "خطا در ثبت رزرو");
+        setBookingLoading(false);
+        return;
+      }
+      const bId = data.bookingId;
       router.push(`/booking/payment?id=${bId}`);
     } catch {
-      router.push(`/booking/payment?id=bk-${Date.now()}`);
+      setMessage("خطا در ارتباط با سرور");
+      setBookingLoading(false);
     }
   }
 

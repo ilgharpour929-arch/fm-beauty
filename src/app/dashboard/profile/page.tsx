@@ -94,7 +94,7 @@ export default function ProfilePage() {
             </div>
 
             {message && (
-              <p className={`text-sm text-center ${message.includes("success") ? "text-success" : "text-danger"}`}>
+              <p className={`text-sm text-center ${message.includes("موفقیت") ? "text-success" : "text-danger"}`}>
                 {message}
               </p>
             )}

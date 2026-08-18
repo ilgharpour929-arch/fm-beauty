@@ -55,7 +55,7 @@ export function LoginForm() {
             <input
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(e.target.value.replace(/[۰-۹]/g, d => '0123456789'[d.charCodeAt(0) - 1776]).replace(/[٠-٩]/g, d => '0123456789'[d.charCodeAt(0) - 1632]))}
               placeholder="مثال: 09123456789"
               className="input-field"
               required

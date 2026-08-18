@@ -37,8 +37,6 @@ export async function POST(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    memoryStore.addUser(newUser);
-
     try {
       const existing = await prisma.user.findFirst({
         where: { OR: [{ phone }, { phone: rawPhone }] },
@@ -61,6 +59,8 @@ export async function POST(request: NextRequest) {
       // If Vercel read-only filesystem blocks DB write, proceed seamlessly
     }
 
+    memoryStore.addUser(newUser);
+
     return NextResponse.json({
       success: true,
       firstName,
@@ -69,8 +69,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     return NextResponse.json({
-      success: true,
-      message: "ثبت‌نام انجام شد",
-    });
+      success: false,
+      message: "خطا در ثبت‌نام",
+    }, { status: 500 });
   }
 }

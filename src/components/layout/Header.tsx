@@ -71,7 +71,7 @@ export function Header() {
                 </Link>
               )}
               <button
-                onClick={() => signOut()}
+                onClick={() => signOut({ callbackUrl: "/" })}
                 className="text-xs text-[var(--color-muted)] hover:text-[var(--color-danger)] transition-colors hidden sm:inline-block px-2"
               >
                 خروج
@@ -122,7 +122,7 @@ export function Header() {
                 ) : (
                   <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="btn-ghost flex-1 !py-2.5 text-sm text-center">حساب من</Link>
                 )}
-                <button onClick={() => { setMenuOpen(false); signOut(); }} className="btn-ghost !py-2.5 text-sm text-[var(--color-danger)]">خروج</button>
+                <button onClick={() => { setMenuOpen(false); signOut({ callbackUrl: "/" }); }} className="btn-ghost !py-2.5 text-sm text-[var(--color-danger)]">خروج</button>
               </>
             ) : (
               <>

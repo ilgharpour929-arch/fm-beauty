@@ -22,6 +22,6 @@ export async function POST(
     });
     return NextResponse.json(booking);
   } catch {
-    return NextResponse.json({ success: true, status: "CONFIRMED" });
+    return NextResponse.json({ error: "Failed to confirm" }, { status: 500 });
   }
 }

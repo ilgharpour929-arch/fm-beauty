@@ -50,7 +50,10 @@ export default function AdminPage() {
       fetch("/api/admin/bookings")
         .then(res => res.json())
         .then((data: any[]) => {
-          if (!Array.isArray(data)) return;
+          if (!Array.isArray(data)) {
+            setStats(s => ({ ...s, loading: false }));
+            return;
+          }
           const todayStr = new Date().toISOString().split("T")[0];
           
           let revenue = 0;

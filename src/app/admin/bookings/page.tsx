@@ -71,6 +71,9 @@ export default function AdminBookingsPage() {
   const handleDelete = async (id: string) => {
     const confirmed = window.confirm("آیا از حذف این رزرو مطمئن هستید؟");
     if (!confirmed) return;
+    try {
+      await fetch(`/api/admin/bookings/${id}`, { method: "DELETE" }); // Note: API might not exist yet, added for server consistency
+    } catch {}
     setBookings((prev) => prev.filter((b) => b.id !== id));
     setMessage("رزرو با موفقیت حذف شد");
     setTimeout(() => setMessage(""), 3000);

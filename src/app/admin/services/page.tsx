@@ -48,7 +48,7 @@ export default function AdminServicesPage() {
     setLoading(true);
     setMessage("");
 
-    const priceVal = editPrice[id] ? parseInt(editPrice[id]) : undefined;
+    const priceVal = editPrice[id] ? (parseInt(editPrice[id]) || 0) : undefined;
     const nameVal = editName[id] || undefined;
     const descVal = editDesc[id] || undefined;
     const imageVal = editImage[id] || undefined;
@@ -139,7 +139,7 @@ export default function AdminServicesPage() {
         body: JSON.stringify({
           name: newName,
           description: newDesc,
-          price: newPrice,
+          price: parseInt(newPrice) || 0,
           image: newImage,
         }),
       });

@@ -106,11 +106,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ bookingId, depositAmount, serviceName: service.name });
   } catch (error: any) {
     console.error("Booking error:", error);
-    return NextResponse.json({
-      bookingId: "bk-" + Date.now(),
-      depositAmount: 450000,
-      serviceName: "اکستنشن مژه"
-    });
+    return NextResponse.json({ error: "خطا در ثبت رزرو" }, { status: 500 });
   }
 }
 

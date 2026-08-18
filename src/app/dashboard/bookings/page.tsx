@@ -22,7 +22,9 @@ export default function UserBookingsPage() {
         headers: { "Cache-Control": "no-cache, no-store, must-revalidate", Pragma: "no-cache" },
       })
         .then((r) => r.json())
-        .then(setBookings)
+        .then((data) => {
+          if (Array.isArray(data)) setBookings(data);
+        })
         .catch(() => {});
     }
   }, [session]);
@@ -76,7 +78,7 @@ export default function UserBookingsPage() {
                 <div key={booking.id} className="glass-card p-5 animate-float-up" style={{ animationDelay: `${i * 0.05}s` }}>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-text-primary">{booking.service.name}</h3>
+                      <h3 className="font-semibold text-text-primary">{booking.service?.name || "خدمت نامشخص"}</h3>
                       <p className="text-sm text-text-muted mt-1">
                         {formatJalali(booking.date)} | {booking.startTime}
                       </p>

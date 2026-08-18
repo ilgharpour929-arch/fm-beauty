@@ -112,7 +112,7 @@ export function RegisterForm() {
             <input
               type="tel"
               value={formData.phone}
-              onChange={(e) => updateField("phone", e.target.value)}
+              onChange={(e) => updateField("phone", e.target.value.replace(/[۰-۹]/g, d => '0123456789'[d.charCodeAt(0) - 1776]).replace(/[٠-٩]/g, d => '0123456789'[d.charCodeAt(0) - 1632]))}
               placeholder="مثال: 09123456789"
               className="input-field"
               required

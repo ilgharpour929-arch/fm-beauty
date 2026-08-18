@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { memoryStore } from "@/lib/store";
 
 export async function POST(
   request: NextRequest,
@@ -12,9 +13,17 @@ export async function POST(
   }
 
   const { id } = await params;
-  const { reason } = await request.json();
+  let reason = "لغو توسط مشتری";
+  try {
+    const body = await request.json();
+    if (body.reason) reason = body.reason;
+  } catch {}
 
-  const booking = await prisma.booking.findUnique({ where: { id } });
+  let booking: any = await prisma.booking.findUnique({ where: { id } }).catch(() => null);
+  if (!booking) {
+    booking = memoryStore.getBookings().find((b) => b.id === id);
+  }
+
   if (!booking) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
@@ -23,13 +32,22 @@ export async function POST(
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const updated = await prisma.booking.update({
-    where: { id },
-    data: {
-      status: "CANCELLED",
-      cancellationReason: reason || "لغو توسط مشتری",
-    },
-  });
+  const validStatuses = ["PENDING_DEPOSIT", "WAITING_APPROVAL", "CONFIRMED"];
+  if (!validStatuses.includes(booking.status)) {
+    return NextResponse.json({ error: "Booking cannot be cancelled" }, { status: 400 });
+  }
 
-  return NextResponse.json(updated);
+  try {
+    await prisma.booking.update({
+      where: { id },
+      data: {
+        status: "CANCELLED",
+        cancellationReason: reason,
+      },
+    });
+  } catch {}
+
+  memoryStore.updateBookingStatus(id, "CANCELLED");
+
+  return NextResponse.json({ success: true, status: "CANCELLED" });
 }

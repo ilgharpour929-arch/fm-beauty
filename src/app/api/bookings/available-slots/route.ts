@@ -12,6 +12,10 @@ export async function GET(request: NextRequest) {
     let bookedTimes = new Set<string>();
 
     try {
+      if (memoryStore.isDateBlocked(date)) {
+        return NextResponse.json([]);
+      }
+
       const blockedDate = await prisma.blockedDate.findUnique({ where: { date } });
       if (blockedDate) {
         return NextResponse.json([]);

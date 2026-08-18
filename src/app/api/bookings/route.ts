@@ -87,6 +87,33 @@ export async function POST(request: NextRequest) {
     });
 
     try {
+      // Ensure user exists in Prisma DB before booking to avoid FK constraint error
+      const dbUser = await prisma.user.findUnique({ where: { id: userId } }).catch(() => null);
+      if (!dbUser) {
+        await prisma.user.create({
+          data: {
+            id: userId,
+            firstName: userName.split(" ")[0] || "کاربر",
+            lastName: userName.split(" ").slice(1).join(" ") || `(${userPhone})`,
+            phone: userPhone,
+            password: "auto-generated",
+          }
+        }).catch(e => console.error("Auto-create user error:", e));
+      }
+
+      // Ensure service exists in Prisma DB before booking to avoid FK constraint error
+      const dbService = await prisma.service.findUnique({ where: { id: serviceId } }).catch(() => null);
+      if (!dbService) {
+        await prisma.service.create({
+          data: {
+            id: serviceId,
+            name: service.name,
+            price: service.price,
+            description: "خدمات پیش‌فرض سیستم",
+          }
+        }).catch(e => console.error("Auto-create service error:", e));
+      }
+
       await prisma.booking.create({
         data: {
           id: bookingId,
@@ -101,6 +128,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (dbError) {
       console.error("Prisma booking creation error:", dbError);
+      return NextResponse.json({ error: "خطا در ثبت رزرو در دیتابیس" }, { status: 500 });
     }
 
     return NextResponse.json({ bookingId, depositAmount, serviceName: service.name });

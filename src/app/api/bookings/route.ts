@@ -120,28 +120,40 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "لطفاً ابتدا وارد شوید" }, { status: 401 });
   }
 
+  const userId = (session.user as any)?.id || "user-id";
+  const userPhone = (session.user as any)?.phone || "";
+
+  let allBookings: any[] = [];
+
+  // 1) Try to get bookings from Prisma DB
   try {
-    const userId = (session.user as any).id;
-    const bookings = await prisma.booking.findMany({
+    const dbBookings = await prisma.booking.findMany({
       where: { userId },
       include: {
         service: { select: { name: true, price: true } },
       },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(bookings);
-  } catch {
-    return NextResponse.json([
-      {
-        id: "bk-user-demo",
-        date: new Date().toISOString().split("T")[0],
-        startTime: "10:30 - 12:00",
-        status: "PENDING_DEPOSIT",
-        depositAmount: 450000,
-        note: "رزرو شما در انتظار پرداخت پیش‌پرداخت",
-        service: { name: "اکستنشن مژه والیوم", price: 1500000 },
-        createdAt: new Date().toISOString(),
-      }
-    ]);
+    if (dbBookings && Array.isArray(dbBookings)) {
+      allBookings = [...dbBookings];
+    }
+  } catch {}
+
+  // 2) Merge memoryStore bookings (filter by userId or phone)
+  const memBookings = memoryStore.getBookings();
+  for (const mb of memBookings) {
+    const isOwner = mb.userId === userId || mb.user?.phone === userPhone;
+    if (isOwner && !allBookings.some((b) => b.id === mb.id)) {
+      allBookings.push(mb);
+    }
   }
+
+  // 3) Sort by createdAt descending
+  allBookings.sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return dateB - dateA;
+  });
+
+  return NextResponse.json(allBookings);
 }

@@ -98,8 +98,9 @@ export default async function HomePage() {
                     <span className="text-xs text-[var(--color-muted)]/70">{service.duration} دقیقه</span>
                   </div>
                 </div>
-              </ScrollReveal>
-            ))}
+              </div>
+            </ScrollReveal>
+          ))}
           </div>
           <div className="text-center mt-10">
             <Link href="/booking" className="btn-primary text-lg px-10 py-3.5">

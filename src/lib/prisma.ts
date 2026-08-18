@@ -6,7 +6,8 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function createPrismaClient() {
   const pool = new Pool({ 
-    connectionString: process.env.DATABASE_URL,
+    // Forcing the correct IPv4 Pooler URL since Vercel has the wrong IPv6 URL in Environment Variables
+    connectionString: "postgresql://postgres.cexswatnnaupzitelyhg:Fajr1379511%40@aws-0-eu-west-1.pooler.supabase.com:6543/postgres",
     ssl: { rejectUnauthorized: false }
   });
   const adapter = new PrismaPg(pool);
